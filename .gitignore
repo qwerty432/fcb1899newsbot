@@ -4,4 +4,4 @@ venv/
 __pycache__/
 *.DS_STORE
 .coverage
-htmlcov/
+constants.py

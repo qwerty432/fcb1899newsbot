@@ -1,13 +1,44 @@
-from flask import Flask
-from flask_sslify import SSLify
+from flask import Flask, request
+import telebot, json
+from constants import token, secret
 
+
+# def write_json(data, filename='answer.json'):
+#     with open(filename, 'w') as f:
+#         json.dump(data, f, indent=2, ensure_ascii=False)
+
+
+bot = telebot.TeleBot(token, threaded=False)
 app = Flask(__name__)
-sslify = SSLify(app)
+
+bot.remove_webhook()
+bot.set_webhook(url="https://dimakit.pythonanywhere.com/{}".format(secret))
 
 
-@app.route('/')
-def index() :
-    return '<h1>Testing page</h1>'
+
+@app.route('/{}'.format(secret), methods=["POST"])
+def webhook():
+    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+    print("Message")
+    return "ok", 200
+
+
+@bot.message_handler(commands=['start'])
+def start_command(message) :
+    print(message)
+    bot.reply_to(message, "Welcome! Here you can find news about Barcelona :)")
+
+
+@bot.message_handler(commands=['help'])
+def help_command(message) :
+    bot.reply_to(message, "Памагити")
+
+
+@bot.message_handler(content_types=['text'])
+def text_response(message) :
+    bot.reply_to(message, "you said '{}'".format(message.text))
+
+
 
 
 if __name__ == '__main__':
