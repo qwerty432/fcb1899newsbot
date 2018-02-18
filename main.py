@@ -23,15 +23,23 @@ def webhook():
     return "ok", 200
 
 
+#handler for '/start' command
 @bot.message_handler(commands=['start'])
 def start_command(message) :
     print(message)
     bot.reply_to(message, "Welcome! Here you can find news about Barcelona :)")
 
 
+#handler for '/help' command
 @bot.message_handler(commands=['help'])
 def help_command(message) :
     bot.reply_to(message, "Памагити")
+
+
+#handler for '/time' command
+@bot.message_handler(commands=['time'])
+def time_command(message) :
+    bot.reply_to(message, parse.parse_time())
 
 
 @bot.message_handler(content_types=['text'])
