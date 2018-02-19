@@ -62,3 +62,31 @@ def parse_time() :
 
 
 
+#function for parsing article
+def parse_article(url) :
+    instant_view = ''
+    page = requests.get(url)
+    html = page.text
+
+    soup = BeautifulSoup(html, 'lxml')
+
+    article = soup.find_all('article')[0]
+    paragraphs = article.find_all('p')
+
+
+    for p in paragraphs :
+        if 'img' in str(p) :
+            image_url = p.find('img')['src']
+            image_name = image_url.split('/')[-1]
+
+
+            download_image(image_url, image_name)
+
+            p = str(p)
+            new_path = prepare_image('images/{}'.format(image_name))
+            p = '<p><img src="{}"/></p'.format(new_path)
+
+
+        instant_view += str(p)
+        return instant_view
+
