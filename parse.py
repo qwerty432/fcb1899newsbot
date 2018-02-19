@@ -13,11 +13,11 @@ def download_image(url, name) :
 #prepare image for inserting to Instant View
 def prepare_image(path):
     with open(path, 'rb') as f:
-    new_path = requests.post(
+        new_path = requests.post(
                 'http://telegra.ph/upload', files={'file': 
                                                     ('file', f, 
                                                     'image/jpeg')}).json()
-    return new_path
+    return new_path[0]['src']
 
 
 
@@ -62,5 +62,3 @@ def parse_time() :
 
 
 
-if __name__ == '__main__':
-     parse_time()
