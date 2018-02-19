@@ -3,7 +3,7 @@ import requests
 from selenium import  webdriver
 
 
-#download image by url to 'image' folder
+#download image by url to 'images' folder
 def download_image(url, name) :
     r = requests.get(url, stream=True)
     if r.status_code == 200:
@@ -71,7 +71,15 @@ def parse_article(url) :
     soup = BeautifulSoup(html, 'lxml')
 
     article = soup.find_all('article')[0]
-    paragraphs = article.find_all('p')
+
+    # title = soup.find('article.intro')[0]
+
+    # article_photo_url = soup.find('.article-photo').find('img')['src']
+
+    # image_name = article_photo_url.split('/')[-1]
+    # download_image(article_photo_url, image_name)
+
+    paragraphs = article.find_all('p')[1:]
 
 
     for p in paragraphs :
@@ -88,5 +96,5 @@ def parse_article(url) :
 
 
         instant_view += str(p)
-        return instant_view
+    return instant_view
 
