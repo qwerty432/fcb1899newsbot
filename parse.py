@@ -10,6 +10,15 @@ def download_image(url, name) :
         with open('images/' + name, 'wb') as f:
             f.write(r.content)
 
+#prepare image for inserting to Instant View
+def prepare_image(path):
+    with open(path, 'rb') as f:
+    new_path = requests.post(
+                'http://telegra.ph/upload', files={'file': 
+                                                    ('file', f, 
+                                                    'image/jpeg')}).json()
+    return new_path
+
 
 
 #dict for endings (1 day, 3 days etc.)
