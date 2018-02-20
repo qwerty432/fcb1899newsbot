@@ -3,7 +3,11 @@ import requests
 from selenium import  webdriver
 
 
-#download image by url to 'images' folder
+#dict for endings (1 day, 3 days etc.)
+endings = {'days': 's', 'hours': 's', 'mins': 's'}
+
+
+#download image by url to 'image' folder
 def download_image(url, name) :
     r = requests.get(url, stream=True)
     if r.status_code == 200:
@@ -18,11 +22,6 @@ def prepare_image(path):
                                                     ('file', f, 
                                                     'image/jpeg')}).json()
     return new_path[0]['src']
-
-
-
-#dict for endings (1 day, 3 days etc.)
-endings = {'days': 's', 'hours': 's', 'mins': 's'}
 
 
 #parse remaining time before next match
@@ -64,20 +63,17 @@ def parse_time() :
 
 #function for parsing article
 def parse_article(url) :
-    instant_view = ''
+    content = ''
     page = requests.get(url)
     html = page.text
 
     soup = BeautifulSoup(html, 'lxml')
 
     article = soup.find_all('article')[0]
+    
+    title = article.find_all('h1')[0].text
 
-    # title = soup.find('article.intro')[0]
 
-    # article_photo_url = soup.find('.article-photo').find('img')['src']
-
-    # image_name = article_photo_url.split('/')[-1]
-    # download_image(article_photo_url, image_name)
 
     paragraphs = article.find_all('p')[1:]
 
@@ -92,9 +88,10 @@ def parse_article(url) :
 
             p = str(p)
             new_path = prepare_image('images/{}'.format(image_name))
-            p = '<p><img src="{}"/></p'.format(new_path)
+            p = '<img src="{}"/>'.format(new_path)
 
 
-        instant_view += str(p)
-    return instant_view
+
+        content += str(p)
+    return title, content
 
