@@ -25,7 +25,7 @@ def make_path(path):
 
 
 #prepares image
-def prepare_image(image_url) :
+def prepare_image(p, image_url) :
     image_name = image_url.split('/')[-1]
 
     download_image(image_url, image_name)
@@ -76,7 +76,7 @@ def parse_time() :
 
 
 #function for parsing article
-def parse_article(url) :
+def parse_article(url, too_big=False) :
     content = ''
     page = requests.get(url)
     html = page.text
@@ -91,15 +91,41 @@ def parse_article(url) :
     for p in paragraphs :
         if 'img' in str(p) :
             image_url = p.find('img')['src']
-            p = prepare_image(image_url)
+            p = prepare_image(p, image_url)
 
-        content += str(p)        
+        if('span' not in str(p)) :
+            content += str(p)     
+
 
         if 'class="intro"' in str(p) :
             image_url = article.find('div', class_='article-photo').\
                                             find('img')['src']
-            p = prepare_image(image_url)
+            p = prepare_image(p, image_url)
             content += str(p)
 
-    return title, content
+    
+    #if article is too big we split it into two different Instant Views
+    if(too_big) :
+        content_list = content.split('<p')
+        print(len(content_list))
 
+
+        middle = int(len(content_list) / 2)
+
+        content1 = '<p'.join(content_list[:middle])
+        
+        content_list[middle] = '<p' + content_list[middle]
+        content2 = '<p'.join(content_list[middle:])
+
+
+        print(content2)
+
+        titles = [title + '. Part1', title + '. Part2']
+        content = [content1, content2]
+
+        return titles, content
+
+
+
+
+    return title, content
