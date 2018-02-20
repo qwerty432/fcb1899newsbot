@@ -7,21 +7,35 @@ from selenium import  webdriver
 endings = {'days': 's', 'hours': 's', 'mins': 's'}
 
 
-#download image by url to 'image' folder
+#download image by url to 'images' folder
 def download_image(url, name) :
     r = requests.get(url, stream=True)
     if r.status_code == 200:
         with open('images/' + name, 'wb') as f:
             f.write(r.content)
 
-#prepare image for inserting to Instant View
-def prepare_image(path):
+#makes new path of image for inserting to Instant View
+def make_path(path):
     with open(path, 'rb') as f:
         new_path = requests.post(
                 'http://telegra.ph/upload', files={'file': 
                                                     ('file', f, 
                                                     'image/jpeg')}).json()
     return new_path[0]['src']
+
+
+#prepares image
+def prepare_image(image_url) :
+    image_name = image_url.split('/')[-1]
+
+    download_image(image_url, image_name)
+
+    p = str(p)
+    new_path = make_path('images/{}'.format(image_name))
+    p = '<img src="{}"/>'.format(new_path)
+    return p
+
+
 
 
 #parse remaining time before next match
@@ -77,27 +91,14 @@ def parse_article(url) :
     for p in paragraphs :
         if 'img' in str(p) :
             image_url = p.find('img')['src']
-            image_name = image_url.split('/')[-1]
-
-
-            download_image(image_url, image_name)
-
-            p = str(p)
-            new_path = prepare_image('images/{}'.format(image_name))
-            p = '<img src="{}"/>'.format(new_path)
+            p = prepare_image(image_url)
 
         content += str(p)        
 
         if 'class="intro"' in str(p) :
             image_url = article.find('div', class_='article-photo').\
                                             find('img')['src']
-            image_name = image_url.split('/')[-1]
-
-            download_image(image_url, image_name)
-
-            p = str(p)
-            new_path = prepare_image('images/{}'.format(image_name))
-            p = '<img src="{}"/>'.format(new_path)
+            p = prepare_image(image_url)
             content += str(p)
 
     return title, content
