@@ -68,13 +68,9 @@ def parse_article(url) :
     html = page.text
 
     soup = BeautifulSoup(html, 'lxml')
-
     article = soup.find_all('article')[0]
     
     title = article.find_all('h1')[0].text
-
-
-
     paragraphs = article.find_all('p')[1:]
 
 
@@ -90,8 +86,19 @@ def parse_article(url) :
             new_path = prepare_image('images/{}'.format(image_name))
             p = '<img src="{}"/>'.format(new_path)
 
+        content += str(p)        
 
+        if 'class="intro"' in str(p) :
+            image_url = article.find('div', class_='article-photo').\
+                                            find('img')['src']
+            image_name = image_url.split('/')[-1]
 
-        content += str(p)
+            download_image(image_url, image_name)
+
+            p = str(p)
+            new_path = prepare_image('images/{}'.format(image_name))
+            p = '<img src="{}"/>'.format(new_path)
+            content += str(p)
+
     return title, content
 
