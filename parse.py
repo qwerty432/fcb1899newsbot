@@ -9,6 +9,7 @@ endings = {'days': 's', 'hours': 's', 'mins': 's'}
 
 #download image by url to 'images' folder
 def download_image(url, name) :
+    print("Downloading image...")
     r = requests.get(url, stream=True)
     if r.status_code == 200:
         with open('images/' + name, 'wb') as f:
@@ -129,3 +130,34 @@ def parse_article(url, too_big=False) :
 
 
     return title, content
+
+
+
+#parse newest event related to Barca
+def parse_latest_news(url) :
+    urls = []
+    flag = False
+    keywords = ['Барселона', 'Вальверде', 'Месси', 'Неймар', 'Суарес', \
+                'Иньеста', 'Букскетс', 'Дембеле', 'Коутиньо', 'Паулиньо', \
+                'Тер Стеген', 'Альба', 'Пике', 'Умтити', 'Роберто', 'Гомеш', \
+                'Бартомеу', 'Каталония', 'Камп Ноу']
+
+    page = requests.get(url)
+    html = page.text
+
+    soup = BeautifulSoup(html, 'lxml')
+
+    news = soup.find('section', class_='news-archive')
+
+    other_news = news.find('ul', class_='archive-list').find_all('li')
+    
+    for article in other_news :
+        title = article.find('h4').find('a')
+        url = title['href']
+        short_descr = article.find('a', class_='intro-text')
+        for keyword in keywords :
+            if keyword in str(title) or keyword in str(short_descr) :
+                flag = True
+                urls.append(url)
+
+    return urls[0]
