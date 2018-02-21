@@ -185,3 +185,13 @@ def parse_latest_news(url) :
                 urls.append(url)
 
     return urls[0]
+
+
+#returns Instant View of newest event
+def get_latest_news() : 
+    url = 'http://football.ua/news/archive/spain/'
+    article_url = parse_latest_news(url)
+
+    instant_view_urls = create_instant_view(article_url)
+
+    return instant_view_urls
