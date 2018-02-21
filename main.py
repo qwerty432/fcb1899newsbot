@@ -42,6 +42,20 @@ def time_command(message) :
     bot.reply_to(message, parse.parse_time())
 
 
+
+#handler for '/news' command
+@bot.message_handler(commands=['news'])
+def news_command(message) :
+    news = parse.get_latest_news()
+    if len(news) == 2 :
+        bot.reply_to(message, news[0])
+        sleep(3)
+        bot.reply_to(message, news[1])
+    else :
+        bot.reply_to(message, news)
+
+
+
 @bot.message_handler(content_types=['text'])
 def text_response(message) :
     bot.reply_to(message, "you said '{}'".format(message.text))
