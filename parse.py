@@ -133,6 +133,28 @@ def parse_article(url, too_big=False) :
 
 
 
+#creates Instant View on telegra.ph
+def create_instant_view(url) :
+    telegraph = Telegraph(teletoken)
+    too_big = False
+    
+    title, content = parse_article(url)
+
+    try :
+        response = telegraph.create_page(title=title, html_content=content)
+        return response['url']
+
+    except TelegraphException :
+        print("Oh no, something went wrong.")
+        titles, contents = parse_article(url, too_big=True)    
+
+        response1 = telegraph.create_page(title=titles[0], html_content=contents[0])
+        response2 = telegraph.create_page(title=titles[1], html_content=contents[1])
+
+        return [response1['url'], response2['url']]
+
+
+
 #parse newest event related to Barca
 def parse_latest_news(url) :
     urls = []
