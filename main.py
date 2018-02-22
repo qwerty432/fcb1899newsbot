@@ -1,6 +1,7 @@
 from flask import Flask, request
 import telebot, json
 from constants import token, secret
+from datetime import datetime
 
 
 # def write_json(data, filename='answer.json'):
@@ -16,6 +17,13 @@ bot.set_webhook(url="https://dimakit.pythonanywhere.com/{}".format(secret))
 
 
 
+#function for writing logs of every message
+def write_logs(message, chat_id, time) :
+    with open('logs.txt', 'a') as file :
+        file.write('\n' + message + '\n' + str(chat_id) + '\n' + str(time) + '\n')
+
+
+
 @app.route('/{}'.format(secret), methods=["POST"])
 def webhook():
     bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
@@ -26,6 +34,7 @@ def webhook():
 #handler for '/start' command
 @bot.message_handler(commands=['start'])
 def start_command(message) :
+    write_logs(message.text, message.chat.id, datetime.now())
     print(message)
     bot.reply_to(message, "Welcome! Here you can find news about Barcelona :)")
 
@@ -33,12 +42,14 @@ def start_command(message) :
 #handler for '/help' command
 @bot.message_handler(commands=['help'])
 def help_command(message) :
+    write_logs(message.text, message.chat.id, datetime.now())
     bot.reply_to(message, "Памагити")
 
 
 #handler for '/time' command
 @bot.message_handler(commands=['time'])
 def time_command(message) :
+    write_logs(message.text, message.chat.id, datetime.now())
     bot.reply_to(message, parse.parse_time())
 
 
@@ -46,6 +57,7 @@ def time_command(message) :
 #handler for '/news' command
 @bot.message_handler(commands=['news'])
 def news_command(message) :
+    write_logs(message.text, message.chat.id, datetime.now())
     news = parse.get_latest_news()
     if len(news) == 2 :
         bot.reply_to(message, news[0])
@@ -58,6 +70,7 @@ def news_command(message) :
 
 @bot.message_handler(content_types=["text"])
 def any_msg(message):
+    write_logs(message.text, message.chat.id, datetime.now())
     keyboard = telebot.types.InlineKeyboardMarkup()
     news = ['Артур: Я еще не подписал контракт с Барселоной', \
     'Барселона согласовала трансфер Артура за 30-40 млн евро', \
