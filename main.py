@@ -56,9 +56,31 @@ def news_command(message) :
 
 
 
-@bot.message_handler(content_types=['text'])
-def text_response(message) :
-    bot.reply_to(message, "you said '{}'".format(message.text))
+@bot.message_handler(content_types=["text"])
+def any_msg(message):
+    keyboard = telebot.types.InlineKeyboardMarkup()
+    news = ['Артур: Я еще не подписал контракт с Барселоной', \
+    'Барселона согласовала трансфер Артура за 30-40 млн евро', \
+    'Примера. Итоги 24-го тура: маниакальный синдром Диего Косты и \
+    харакири от Бетиса', 'Барселона просмотрела Клюйверта и еще 3 \
+    игроков Аякса', 'В нынешнем сезоне Роналду забивает чаще, чем Месси', \
+    'Вальверде: Не выпустил Коутиньо в старте, чтобы победить', \
+    'Непобедимый Паулиньо установил рекорд Примеры', \
+    'Хави: Реал умеет побеждать, играя плохо, а Барса — нет', \
+    'Месси установил рекорд по попаданиям в каркас ворот в Примере', \
+    'Барселона обыграла Эйбар']
+
+
+    callback_buttons = []
+    for i in range(len(news)) :
+        length = len(news)
+        callback_buttons.append(telebot.types.InlineKeyboardButton(text=news[i], callback_data="test{}".format(i)))
+
+    for button in callback_buttons :    
+        keyboard.add(button)
+    
+    bot.send_message(message.chat.id, "Last news:", reply_markup=keyboard)
+
 
 
 
