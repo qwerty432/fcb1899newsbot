@@ -58,42 +58,32 @@ def time_command(message) :
 @bot.message_handler(commands=['news'])
 def news_command(message) :
     write_logs(message.text, message.chat.id, datetime.now())
-    news = parse.get_latest_news()
-    if len(news) == 2 :
-        bot.reply_to(message, news[0])
-        sleep(3)
-        bot.reply_to(message, news[1])
-    else :
-        bot.reply_to(message, news)
 
-
-
-@bot.message_handler(content_types=["text"])
-def any_msg(message):
-    write_logs(message.text, message.chat.id, datetime.now())
     keyboard = telebot.types.InlineKeyboardMarkup()
-    news = ['Артур: Я еще не подписал контракт с Барселоной', \
-    'Барселона согласовала трансфер Артура за 30-40 млн евро', \
-    'Примера. Итоги 24-го тура: маниакальный синдром Диего Косты и \
-    харакири от Бетиса', 'Барселона просмотрела Клюйверта и еще 3 \
-    игроков Аякса', 'В нынешнем сезоне Роналду забивает чаще, чем Месси', \
-    'Вальверде: Не выпустил Коутиньо в старте, чтобы победить', \
-    'Непобедимый Паулиньо установил рекорд Примеры', \
-    'Хави: Реал умеет побеждать, играя плохо, а Барса — нет', \
-    'Месси установил рекорд по попаданиям в каркас ворот в Примере', \
-    'Барселона обыграла Эйбар']
-
-
+    # news = parse.get_latest_news()
+    # if len(news) == 2 :
+    #     bot.reply_to(message, news[0])
+    #     sleep(3)
+    #     bot.reply_to(message, news[1])
+    # else :
+    #     bot.reply_to(message, news)
+    news = parse.parse_latest_news()
+    titles = news[0]
     callback_buttons = []
-    for i in range(len(news)) :
-        length = len(news)
-        callback_buttons.append(telebot.types.InlineKeyboardButton(text=news[i], callback_data="test{}".format(i)))
+    for i in range(len(titles)) :
+        callback_buttons.append(telebot.types.InlineKeyboardButton(text=titles[i], callback_data="test{}".format(i)))
 
     for button in callback_buttons :    
         keyboard.add(button)
     
     bot.send_message(message.chat.id, "Last news:", reply_markup=keyboard)
 
+
+
+@bot.message_handler(content_types=["text"])
+def any_msg(message):
+    write_logs(message.text, message.chat.id, datetime.now())
+    bot.send_message(message.chat.id, "You said: {}".format(message.text))
 
 
 
