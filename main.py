@@ -52,7 +52,7 @@ def help_command(message) :
 @bot.message_handler(commands=['time'])
 def time_command(message) :
     write_logs(message.text, message.chat.id, datetime.now())
-    bot.reply_to(message, parse.parse_time())
+    bot.reply_to(message, "Time to next match: {}".format(parse.parse_time()))
 
 
 

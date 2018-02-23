@@ -41,38 +41,47 @@ def prepare_image(p, image_url) :
 
 #parse remaining time before next match
 def parse_time() :
-    url = "https://www.fcbarcelona.com/"
-    # page = requests.get(url)
+    url = "http://www.skysports.com/barcelona"
+    page = requests.get(url)
+    html = page.text
 
-    driver = webdriver.Firefox()    
-    driver.get(url)
+    soup = BeautifulSoup(html, 'lxml')
+
+
+    next_match = soup.find('div', class_='matches-block__match-list')
+    next_match_date = next_match.find_all('h4',class_='matches__group-header')\
+                            [3].text
+    time = next_match.find_all('ul', class_='matches__group')[3].\
+                        find('span', class_='matches__date').text
+
+
+    hours = time.split(':')[0][-2:]
+    minutes = time.split(':')[1][:2]
     
+    words = next_match_date.split(' ')
+    day = words[1][:-2]
+    month = months[words[2]]
 
-    page = driver.page_source
-    soup = BeautifulSoup(page, 'lxml')
+    match_date = datetime(2018, month, int(day), int(hours), int(minutes), 0)
+    today = datetime.now()
 
-    time_left = soup.find('p', class_='matches__countdown')
+    time_left = match_date - today
 
-    days_left = time_left.find('span', id = 'days').text
-    hours_left = time_left.find('span', id = 'hours').text
-    minutes_left = time_left.find('span', id = 'mins').text
+    # if int(days_left) == 1 :
+    #     endings['days'] = ''
+    # elif int(hours_left) == 1 :
+    #     endings['hours'] = ''
+    # elif int(minutes_left) == 1 :
+    #     endings['mins'] = ''
 
+    # print(endings['days'])
 
-    if int(days_left) == 1 :
-        endings['days'] = ''
-    elif int(hours_left) == 1 :
-        endings['hours'] = ''
-    elif int(minutes_left) == 1 :
-        endings['mins'] = ''
+    # time = "Time to next match: {} day{}, {} hour{} {} minute{}".\
+    #     format(days_left, endings['days'], hours_left, \
+    #             endings['hours'], minutes_left, endings['mins'])
+    # print(time)
 
-    print(endings['days'])
-
-    time = "Time to next match: {} day{}, {} hour{} {} minute{}".\
-        format(days_left, endings['days'], hours_left, \
-                endings['hours'], minutes_left, endings['mins'])
-    print(time)
-
-    return time
+    return time_left
 
 
 
