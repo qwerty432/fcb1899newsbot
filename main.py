@@ -8,6 +8,8 @@ from datetime import datetime
 #     with open(filename, 'w') as f:
 #         json.dump(data, f, indent=2, ensure_ascii=False)
 
+global ten_urls
+
 
 bot = telebot.TeleBot(token, threaded=False)
 app = Flask(__name__)
@@ -57,6 +59,8 @@ def time_command(message) :
 #handler for '/news' command
 @bot.message_handler(commands=['news'])
 def news_command(message) :
+    global ten_urls
+    ten_urls = []
     write_logs(message.text, message.chat.id, datetime.now())
 
     keyboard = telebot.types.InlineKeyboardMarkup()
@@ -69,6 +73,7 @@ def news_command(message) :
     #     bot.reply_to(message, news)
     news = parse.parse_latest_news()
     titles = news[0]
+    ten_urls.extend(news[1])
     callback_buttons = []
     for i in range(len(titles)) :
         callback_buttons.append(telebot.types.InlineKeyboardButton(text=titles[i], callback_data="test{}".format(i)))
@@ -84,6 +89,18 @@ def news_command(message) :
 def any_msg(message):
     write_logs(message.text, message.chat.id, datetime.now())
     bot.send_message(message.chat.id, "You said: {}".format(message.text))
+
+
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_inline(call):
+    global ten_urls
+    if call.message:
+        for i in range(len(ten_urls)) :
+            if call.data == "test{}".format(i):
+                instant_view = parse.create_instant_view(ten_urls[i])
+                bot.send_message(call.message.chat.id, instant_view)         
+
 
 
 
