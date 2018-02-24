@@ -176,7 +176,7 @@ def parse_latest_news(url) :
                 'Тер Стеген', 'Альба', 'Пике', 'Умтити', 'Роберто', 'Гомеш', \
                 'Бартомеу', 'Каталония', 'Камп Ноу', 'Силессен', 'Мина', \
                 'Видаль', 'Динь', 'Семеду', 'Вермален', 'Денис Суарес',\
-                'Денис', 'Ракитич', 'Алькасер', 'Пако', 'Арнаис']
+                'Денис', 'Ракитич', 'Алькасер', 'Пако', 'Арнаис', 'Анонс', 'Итоги']
 
      while(len(urls) < 10) :
         main_url = 'http://football.ua/news/archive/spain/page{}.html'.format(page_num)
@@ -216,12 +216,3 @@ def parse_latest_news(url) :
 
     return all_news
 
-
-#returns Instant View of newest event
-def get_latest_news() : 
-    url = 'http://football.ua/news/archive/spain/'
-    article_url = parse_latest_news(url)
-
-    instant_view_urls = create_instant_view(article_url)
-
-    return instant_view_urls

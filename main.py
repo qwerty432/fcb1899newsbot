@@ -20,10 +20,10 @@ bot.set_webhook(url="https://dimakit.pythonanywhere.com/{}".format(secret))
 
 
 #function for writing logs of every message
-def write_logs(message, chat_id, time) :
+def write_logs(message, username, chat_id, time) :
     with open('logs.txt', 'a') as file :
-        file.write('\n' + message + '\n' + str(chat_id) + '\n' + str(time) + '\n')
-
+        file.write('\n' + message + '\n' + username  + '\n' + str(chat_id) +\
+                     '\n' + str(time) + '\n')
 
 
 @app.route('/{}'.format(secret), methods=["POST"])
@@ -36,7 +36,7 @@ def webhook():
 #handler for '/start' command
 @bot.message_handler(commands=['start'])
 def start_command(message) :
-    write_logs(message.text, message.chat.id, datetime.now())
+    write_logs(message.text, message.from_user.username, message.chat.id, datetime.now())
     print(message)
     bot.reply_to(message, "Welcome! Here you can find news about Barcelona :)")
 
@@ -44,14 +44,14 @@ def start_command(message) :
 #handler for '/help' command
 @bot.message_handler(commands=['help'])
 def help_command(message) :
-    write_logs(message.text, message.chat.id, datetime.now())
+    write_logs(message.text, message.from_user.username, message.chat.id, datetime.now())
     bot.reply_to(message, "Памагити")
 
 
 #handler for '/time' command
 @bot.message_handler(commands=['time'])
 def time_command(message) :
-    write_logs(message.text, message.chat.id, datetime.now())
+    write_logs(message.text, message.from_user.username, message.chat.id, datetime.now())
     bot.reply_to(message, "Time to next match: {}".format(parse.parse_time()))
 
 
@@ -61,16 +61,9 @@ def time_command(message) :
 def news_command(message) :
     global ten_urls
     ten_urls = []
-    write_logs(message.text, message.chat.id, datetime.now())
+    write_logs(message.text, message.from_user.username, message.chat.id, datetime.now())
 
     keyboard = telebot.types.InlineKeyboardMarkup()
-    # news = parse.get_latest_news()
-    # if len(news) == 2 :
-    #     bot.reply_to(message, news[0])
-    #     sleep(3)
-    #     bot.reply_to(message, news[1])
-    # else :
-    #     bot.reply_to(message, news)
     news = parse.parse_latest_news()
     titles = news[0]
     ten_urls.extend(news[1])
@@ -85,9 +78,10 @@ def news_command(message) :
 
 
 
+
 @bot.message_handler(content_types=["text"])
 def any_msg(message):
-    write_logs(message.text, message.chat.id, datetime.now())
+    write_logs(message.text, message.from_user.username, message.chat.id, datetime.now())
     bot.send_message(message.chat.id, "You said: {}".format(message.text))
 
 
@@ -99,7 +93,12 @@ def callback_inline(call):
         for i in range(len(ten_urls)) :
             if call.data == "test{}".format(i):
                 instant_view = parse.create_instant_view(ten_urls[i])
-                bot.send_message(call.message.chat.id, instant_view)         
+                if(len(instant_view)) == 2 :
+                    bot.send_message(call.message.chat.id, instant_view[0])
+                    sleep(1)
+                    bot.send_message(call.message.chat.id,  instant_view[1])
+                else :
+                    bot.send_message(call.message.chat.id, instant_view)         
 
 
 
