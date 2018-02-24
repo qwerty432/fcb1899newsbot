@@ -48,11 +48,19 @@ def help_command(message) :
     bot.reply_to(message, "Памагити")
 
 
+#handler for /next command
+@bot.message_handler(commands=['next'])
+def next_command(message) :
+    write_logs(message.text, message.from_user.username, message.chat.id, datetime.now())
+    bot.send_message(message.chat.id, parse.parse_info())
+
+
+
 #handler for '/time' command
 @bot.message_handler(commands=['time'])
 def time_command(message) :
     write_logs(message.text, message.from_user.username, message.chat.id, datetime.now())
-    bot.reply_to(message, "Time to next match: {}".format(parse.parse_time()))
+    bot.send_message(message.chat.id, "Time to next match: {}".format(parse.parse_time()))
 
 
 
