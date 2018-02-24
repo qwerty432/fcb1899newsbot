@@ -1,15 +1,53 @@
+# -*- coding: utf-8 -*-
 from bs4 import BeautifulSoup
 import requests
 from selenium import  webdriver
+from constants import teletoken
+from telegraph import Telegraph
+from telegraph.exceptions import TelegraphException
+from datetime import datetime, date
+
+
+months = {'January': 1, 'February': 2, 'March': 3, 'April': 4, 'May': 5, 
+            'June': 6, 'July': 7, 'August': 8, 'September': 9, 'October': 10,
+            'November': 11, 'December': 12,}
 
 
 #dict for endings (1 day, 3 days etc.)
 endings = {'days': 's', 'hours': 's', 'mins': 's'}
 
 
+
+def parse_next_match(parameter) :
+
+    url = "http://football.ua/club/51-barcelona.html"
+    page = requests.get(url)
+    html = page.text
+
+    soup = BeautifulSoup(html, 'lxml')
+
+
+    next_matches = soup.find_all('table', class_='feed-table')[1].find_all('tr')
+    next_match_where = next_matches[0].find('p').text.replace(' ', '').replace('\r', '').split('\n')[1:-1]
+    next_match_date = next_match_where[0]
+    next_match_tournament = next_match_where[1]
+    next_match_stage = next_match_where[2]
+
+
+    next_match_time = next_matches[1].find_all('td')[0].text
+    next_match_home = next_matches[1].find_all('td')[1].text.replace(' ', '').replace('\n', '')
+    next_match_guest = next_matches[1].find_all('td')[3].text.replace(' ', '').replace('\n', '')
+
+    if parameter == 'time' :
+        return next_match_date, next_match_time
+    elif parameter == 'info' :
+        return next_match_home, next_match_guest, next_match_tournament, \
+                next_match_stage, next_match_date, next_match_time
+
+
+
 #download image by url to 'images' folder
 def download_image(url, name) :
-    print("Downloading image...")
     r = requests.get(url, stream=True)
     if r.status_code == 200:
         with open('images/' + name, 'wb') as f:
@@ -39,33 +77,38 @@ def prepare_image(p, image_url) :
 
 
 
+def parse_info() :
+    info = parse_next_match('info')
+
+    home = info[0]
+    guest = info[1]
+
+    tournament = info[2]
+    stage = info[3]
+
+    date = info[4]
+
+    time = info[5]
+
+    return "📌 Следующий матч:\n⚽{} — {}\n🏆{}, {}\n📅{}, {}".format(home, guest,\
+                                tournament, stage, date, time)
+
+
 #parse remaining time before next match
 def parse_time() :
-    url = "http://www.skysports.com/barcelona"
-    page = requests.get(url)
-    html = page.text
+    date, time = parse_next_match('time')
+    day = int(date.split('.')[0])
+    month = int(date.split('.')[1])
+    year = int(date.split('.')[2])
 
-    soup = BeautifulSoup(html, 'lxml')
+    hours = int(time.split(':')[0])
+    minutes = int(time.split(':')[1])
 
+    now = datetime.now()
+    match_date = datetime(year, month, day, hours, minutes, 0)
 
-    next_match = soup.find('div', class_='matches-block__match-list')
-    next_match_date = next_match.find_all('h4',class_='matches__group-header')\
-                            [3].text
-    time = next_match.find_all('ul', class_='matches__group')[3].\
-                        find('span', class_='matches__date').text
+    time_left = match_date - now
 
-
-    hours = time.split(':')[0][-2:]
-    minutes = time.split(':')[1][:2]
-    
-    words = next_match_date.split(' ')
-    day = words[1][:-2]
-    month = months[words[2]]
-
-    match_date = datetime(2018, month, int(day), int(hours), int(minutes), 0)
-    today = datetime.now()
-
-    time_left = match_date - today
 
     # if int(days_left) == 1 :
     #     endings['days'] = ''
@@ -142,7 +185,6 @@ def parse_article(url, too_big=False) :
 
 
 
-#creates Instant View on telegra.ph
 def create_instant_view(url) :
     telegraph = Telegraph(teletoken)
     too_big = False
@@ -164,8 +206,9 @@ def create_instant_view(url) :
 
 
 
-#parse newest 10 events related to Barca
-def parse_latest_news(url) :
+
+
+def parse_latest_news() :
     all_news = []
     page_num = 1
     titles = []
@@ -178,7 +221,7 @@ def parse_latest_news(url) :
                 'Видаль', 'Динь', 'Семеду', 'Вермален', 'Денис Суарес',\
                 'Денис', 'Ракитич', 'Алькасер', 'Пако', 'Арнаис', 'Анонс', 'Итоги']
 
-     while(len(urls) < 10) :
+    while(len(urls) < 10) :
         main_url = 'http://football.ua/news/archive/spain/page{}.html'.format(page_num)
 
 
@@ -193,8 +236,6 @@ def parse_latest_news(url) :
 
         other_news = news.find('ul', class_='archive-list').find_all('li')
         
-        print(main_url)
-
         for article in other_news :
             flag = False
             title = article.find('h4').find('a')
@@ -216,3 +257,5 @@ def parse_latest_news(url) :
 
     return all_news
 
+
+print(parse_info())
