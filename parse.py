@@ -76,7 +76,7 @@ def prepare_image(p, image_url) :
 
 
 
-
+#parse info about next match
 def parse_info() :
     info = parse_next_match('info')
 
@@ -257,5 +257,3 @@ def parse_latest_news() :
 
     return all_news
 
-
-print(parse_info())
