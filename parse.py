@@ -166,7 +166,7 @@ def parse_article(url, too_big=False) :
             content += str(p)
     
     #if article is too big we split it into two different Instant Views
-    if(too_big) :
+    if too_big :
         content_list = content.split('<p')  #split all paragraphs
         middle = int(len(content_list) / 2) #middle of all paragraphs
 
@@ -198,7 +198,8 @@ def create_instant_view(url) :
 
     except TelegraphException : #if article is too big
         print("Oh no, something went wrong.")
-        titles, contents = parse_article(url, too_big=True)    
+        titles, contents = parse_article(url, too_big=True)   
+        clear_images() 
 
         response1 = telegraph.create_page(title=titles[0], 
                                           html_content=contents[0])
