@@ -23,8 +23,8 @@ def download_image(url, name) :
 def make_path(path):
     with open(path, 'rb') as f:
         new_path = requests.post(
-                'http://telegra.ph/upload', files={'file': 
-                                                    ('file', f, 
+                'http://telegra.ph/upload', files={'file':
+                                                    ('file', f,
                                                     'image/jpeg')}).json()
     return new_path[0]['src']
 
@@ -59,8 +59,8 @@ def parse_next_match(parameter) :
 
     #scrapes next matches table
     next_matches = soup.find_all('table', class_='feed-table')[1]\
-                       .find_all('tr') 
-    
+                       .find_all('tr')
+
     #scrapes info about when and in which tournament next match will be
     next_match_where = next_matches[0].find('p').text\
                                       .replace(' ', '')\
@@ -68,7 +68,7 @@ def parse_next_match(parameter) :
                                       .split('\n')[1:-1]
 
     next_match_date = next_match_where[0]
-    next_match_tournament = next_match_where[1]
+    next_match_tournament = next_match_where[1].replace('.', '. ')
     next_match_stage = next_match_where[2]
 
     #scrapes info about home and guest teams and time of the match
@@ -138,7 +138,6 @@ def parse_time() :
     return time_left
 
 
-
 #function for parsing article
 def parse_article(url, too_big=False) :
     content = ''
@@ -147,7 +146,7 @@ def parse_article(url, too_big=False) :
 
     soup = BeautifulSoup(html, 'lxml')
     article = soup.find_all('article')[0]
-    
+
     title = article.find_all('h1')[0].text  #title of article
     paragraphs = article.find_all('p')[1:]  #all useful text from article
 
@@ -157,21 +156,21 @@ def parse_article(url, too_big=False) :
             p = prepare_image(image_url)    #create image path appr. for Telegraph
 
         if('span' not in str(p)) :  #'span' tag is not allowed in telegraph
-            content += str(p)     
+            content += str(p)
 
         if 'class="intro"' in str(p) :  #get article photo
             image_url = article.find('div', class_='article-photo')\
                                .find('img')['src']
             p = prepare_image(image_url)
             content += str(p)
-    
+
     #if article is too big we split it into two different Instant Views
     if too_big :
         content_list = content.split('<p')  #split all paragraphs
         middle = int(len(content_list) / 2) #middle of all paragraphs
 
         content1 = '<p'.join(content_list[:middle]) #first page
-        
+
         content_list[middle] = '<p' + content_list[middle]
         content2 = '<p'.join(content_list[middle:]) #second page
 
@@ -184,11 +183,12 @@ def parse_article(url, too_big=False) :
 
     return title, content
 
+
 #function for creating Instant View
 def create_instant_view(url) :
     telegraph = Telegraph(teletoken)
     too_big = False
-    
+
     title, content = parse_article(url)
     clear_images()
 
@@ -198,12 +198,12 @@ def create_instant_view(url) :
 
     except TelegraphException : #if article is too big
         print("Oh no, something went wrong.")
-        titles, contents = parse_article(url, too_big=True)   
-        clear_images() 
+        titles, contents = parse_article(url, too_big=True)
+        clear_images()
 
-        response1 = telegraph.create_page(title=titles[0], 
+        response1 = telegraph.create_page(title=titles[0],
                                           html_content=contents[0])
-        response2 = telegraph.create_page(title=titles[1], 
+        response2 = telegraph.create_page(title=titles[1],
                                           html_content=contents[1])
         #urls of created telegraph pages
         return [response1['url'], response2['url']]
@@ -234,13 +234,13 @@ def parse_latest_news() :
 
         news = soup.find('section', class_='news-archive')
         other_news = news.find('ul', class_='archive-list').find_all('li')
-        
+
         for article in other_news :
             flag = False
             title = article.find('h4').find('a')
             url = title['href']
             short_descr = article.find('a', class_='intro-text')
-            
+
             for keyword in keywords :
                 if keyword in str(title) and not flag and len(urls) < 10:
                     urls.append(url)
