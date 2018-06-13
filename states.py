@@ -1,4 +1,5 @@
 import users_controller
+import keyboards
 
 
 class States(object):
@@ -21,6 +22,7 @@ class States(object):
 
     def start_state(self, message, first_entry=False):
         if first_entry:
-            self.bot.send_message(message.chat.id, 'Hello there!')
+            self.bot.send_message(message.chat.id, 'Hello there!',
+                                  reply_markup=keyboards.set_main_keyboard())
         else:
             self.bot.send_message(message.chat.id, 'Again here')
