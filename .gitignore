@@ -4,4 +4,5 @@ venv/
 __pycache__/
 *.DS_STORE
 .coverage
-constants.py
+config.py
+logs.txt
