@@ -8,3 +8,9 @@ def set_main_keyboard():
     keyboard.row('Время')
     keyboard.row('Настройки')
     return keyboard
+
+
+def set_return_keyboard():
+    keyboard = types.ReplyKeyboardMarkup(True)
+    keyboard.row('Назад')
+    return keyboard

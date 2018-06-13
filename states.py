@@ -5,8 +5,7 @@ import keyboards
 class States(object):
     def __init__(self, bot):
         self.bot = bot
-        self.states = {'start': self.start_state
-                       }
+        self.states = {'start': self.start_state, 'next_match_state': self.next_match_state}
 
     def handle_states(self, message, first_entry=False):
         user = users_controller.get_user(message.chat.id)
@@ -25,4 +24,15 @@ class States(object):
             self.bot.send_message(message.chat.id, 'Hello there!',
                                   reply_markup=keyboards.set_main_keyboard())
         else:
-            self.bot.send_message(message.chat.id, 'Again here')
+            if message.text == 'Следующий матч':
+                self.go_to_state(message, 'next_match_state')
+            else:
+                self.bot.send_message(message.chat.id, 'Hello there!',
+                                      reply_markup=keyboards.set_main_keyboard())
+
+    def next_match_state(self, message, first_entry=False):
+        if first_entry:
+            self.bot.send_message(message.chat.id, 'Следующий матч',
+                                  reply_markup=keyboards.set_return_keyboard())
+        else:
+            self.go_to_state(message, 'start')
