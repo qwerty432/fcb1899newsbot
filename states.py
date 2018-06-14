@@ -1,5 +1,6 @@
 import users_controller
 import keyboards
+import parse
 
 
 class States(object):
@@ -32,7 +33,7 @@ class States(object):
 
     def next_match_state(self, message, first_entry=False):
         if first_entry:
-            self.bot.send_message(message.chat.id, 'Следующий матч',
+            self.bot.send_message(message.chat.id, parse.parse_info(),
                                   reply_markup=keyboards.set_return_keyboard())
         else:
             self.go_to_state(message, 'start')
