@@ -3,6 +3,7 @@ import config
 from bot import bot
 from states import States
 import users_controller
+import parse
 
 state_handler = States(bot)
 
@@ -26,6 +27,21 @@ def handle_text(message):
         state_handler.handle_states(message)
     except Exception as e:
         print('[ERROR]: {}'.format(e))
+
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_inline(call):
+    if call.message:
+        user = users_controller.get_user(call.message.chat.id)
+        for i, url in enumerate(user['news_urls']):
+            if call.data == "button{}".format(i):
+                instant_view = parse.create_instant_view(url)
+                if len(instant_view) == 2:
+                    bot.send_message(call.message.chat.id, instant_view[0])
+                    sleep(1)
+                    bot.send_message(call.message.chat.id, instant_view[1])
+                else:
+                    bot.send_message(call.message.chat.id, instant_view)
 
 
 if __name__ == '__main__':
