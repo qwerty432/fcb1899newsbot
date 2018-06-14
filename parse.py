@@ -61,8 +61,6 @@ def parse_next_match(parameter) :
     next_matches = soup.find_all('table', class_='feed-table')[1]\
                        .find_all('tr')
 
-    print(next_matches)
-
     #scrapes info about when and in which tournament next match will be
     next_match_where = next_matches[0].find('p').text\
                                       .replace(' ', '')\
