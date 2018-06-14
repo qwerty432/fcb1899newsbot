@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 from telegraph import Telegraph
 from telegraph.exceptions import TelegraphException
-from constants import teletoken, BASE_DIR
+from config import teletoken, BASE_DIR
 
 #dict for endings (1 day, 3 days etc.)
 endings = {'days': 's', 'hours': 's', 'mins': 's'}
@@ -51,7 +51,7 @@ def clear_images() :
 
 #parses all information about next match
 def parse_next_match(parameter) :
-    url = "http://football.ua/club/51-barcelona.html"
+    url = "http://football.ua/club/165-sweden.html"
     page = requests.get(url)
     html = page.text
 
@@ -60,6 +60,8 @@ def parse_next_match(parameter) :
     #scrapes next matches table
     next_matches = soup.find_all('table', class_='feed-table')[1]\
                        .find_all('tr')
+
+    print(next_matches)
 
     #scrapes info about when and in which tournament next match will be
     next_match_where = next_matches[0].find('p').text\
@@ -210,7 +212,7 @@ def create_instant_view(url) :
 
 #parse 10 latest news about Barca
 def parse_latest_news() :
-    all_news = []
+    all_news = {}
     page_num = 1
     titles = []
     urls = []
@@ -248,7 +250,7 @@ def parse_latest_news() :
                     flag = True
         page_num += 1
 
-    all_news.append(titles)
-    all_news.append(urls)
+    all_news['titles'] = titles
+    all_news['urls'] = urls
 
     return all_news
