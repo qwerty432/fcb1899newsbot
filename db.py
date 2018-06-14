@@ -4,8 +4,6 @@ import config
 
 def connect(user=config.USER, password=config.PASSWORD, db=config.DB_NAME, host='localhost', port=5432):
     '''Returns a connection and a metadata object'''
-    # We connect with the help of the PostgreSQL URL
-    # postgresql://federer:grandestslam@localhost:5432/tennis
     url = 'postgresql://{}:{}@{}:{}/{}'.format(user, password, host, port, db)
 
     # The return value of create_engine() is our connection object

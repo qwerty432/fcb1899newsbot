@@ -1,5 +1,5 @@
 from db import connect
-from sqlalchemy import Table, Column, Integer, String, ForeignKey
+from sqlalchemy import Table, Column, Integer, String, ARRAY
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import select
 
@@ -10,7 +10,8 @@ def create_user_table():
         users = Table('users', meta,
             Column('id', Integer, primary_key=True),
             Column('username', String),
-            Column('state', String(50))
+            Column('state', String(50)),
+            Column('news_urls', ARRAY(String), default=[])
             )
         meta.create_all(con)
     except:
@@ -21,6 +22,14 @@ def delete_all_users():
     try:
         user_table = meta.tables['users']
         con.execute(user_table.delete())
+    except KeyError:
+        print('Table does not exist')
+
+
+def drop_user_table():
+    try:
+        user_table = meta.tables['users']
+        user_table.drop()
     except KeyError:
         print('Table does not exist')
 
@@ -63,5 +72,12 @@ def get_user(user_id):
 def update_state(user_id, state):
     users = meta.tables['users']
     query = users.update().where(users.c.id == user_id).values(state=state)
+
+    con.execute(query)
+
+
+def set_urls(user_id, urls):
+    users = meta.tables['users']
+    query = users.update().where(users.c.id == user_id).values(news_urls=urls)
 
     con.execute(query)
