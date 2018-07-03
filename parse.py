@@ -252,3 +252,14 @@ def parse_latest_news() :
     all_news['urls'] = urls
 
     return all_news
+
+
+def get_teams_list():
+    url = 'https://2018.football.ua/teams'
+    page = requests.get(url)
+    html = page.text
+
+    soup = BeautifulSoup(html, 'lxml')
+
+    teams = soup.find('ul', class_="news-list three-columns-list teams-list-page clearfix").find_all('li')
+    return [team.find('h2', class_='news-title').text for team in teams]
