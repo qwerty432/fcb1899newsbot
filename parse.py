@@ -266,6 +266,34 @@ def get_football_link(name):
     return link
 
 
+def parse_teams():
+    teams_dict = {}
+    url = 'https://2018.football.ua'
+    page = requests.get(url + '/teams')
+    html = page.text
+
+    soup = BeautifulSoup(html, 'lxml')
+
+    teams = soup.find('ul', class_="news-list three-columns-list teams-list-page clearfix").find_all('li')
+
+    for team in teams:
+        team_name = team.find('h2', class_='news-title').text
+        foot_link = get_football_link(team_name)
+        champ_link = url + team.find('a', class_='news-link')['href']
+
+        link_dict = {
+                    'foot_link': foot_link,
+                    'champ_link': champ_link
+                   }
+
+        teams_dict[team_name] = link_dict
+
+    with open('footlinks.json', 'w') as file:
+        json.dump(teams_dict, file, indent=4, ensure_ascii=False)
+
+    return sorted([team for team in teams_dict])
+
+
 def get_teams_list():
     teams_list = []
     try:
@@ -273,36 +301,6 @@ def get_teams_list():
             data = json.load(file)
             teams_list = sorted([team for team in data])
     except FileNotFoundError:
-        teams_dict = {}
-        url = 'https://2018.football.ua'
-        page = requests.get(url + '/teams')
-        html = page.text
+        teams_list = parse_teams()
 
-        soup = BeautifulSoup(html, 'lxml')
-
-        teams = soup.find('ul', class_="news-list three-columns-list teams-list-page clearfix").find_all('li')
-
-        for team in teams:
-            team_name = team.find('h2', class_='news-title').text
-            foot_link = get_football_link(team_name)
-            champ_link = url + team.find('a', class_='news-link')['href']
-
-            link_dict = {
-                        'foot_link': foot_link,
-                        'champ_link': champ_link
-                       }
-
-            teams_dict[team_name] = link_dict
-
-        with open('footlinks.json', 'w') as file:
-            json.dump(teams_dict, file, indent=4, ensure_ascii=False)
-
-    if teams_list:
-        return teams_list
-    else:
-        return sorted([team for team in teams_dict])
-
-
-
-print(get_teams_list())
-# get_football_link('Испания')
+    return teams_list
