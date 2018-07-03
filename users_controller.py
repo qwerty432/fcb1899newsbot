@@ -11,6 +11,7 @@ def create_user_table():
             Column('id', Integer, primary_key=True),
             Column('username', String),
             Column('state', String(50)),
+            Column('team', String(20)),
             Column('news_urls', ARRAY(String), default=[])
             )
         meta.create_all(con)
@@ -79,5 +80,12 @@ def update_state(user_id, state):
 def set_urls(user_id, urls):
     users = meta.tables['users']
     query = users.update().where(users.c.id == user_id).values(news_urls=urls)
+
+    con.execute(query)
+
+
+def set_team(user_id, team_name):
+    users = meta.tables['users']
+    query = users.update().where(users.c.id == user_id).values(team=team_name)
 
     con.execute(query)
