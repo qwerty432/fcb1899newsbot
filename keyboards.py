@@ -31,3 +31,22 @@ def set_news_buttons(user_id):
         keyboard.add(button)
 
     return keyboard
+
+
+def set_settings_keyboard():
+    keyboard = types.ReplyKeyboardMarkup(True)
+
+    keyboard.row('Выбрать команду')
+    keyboard.row('Назад')
+    return keyboard
+
+
+def set_teams_keyboard():
+    keyboard = types.ReplyKeyboardMarkup(True)
+
+    teams = parse.get_teams_list()
+
+    for i, team in enumerate(teams):
+        keyboard.row(team)
+
+    return keyboard
