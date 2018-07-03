@@ -48,5 +48,6 @@ def set_teams_keyboard():
 
     for i, team in enumerate(teams):
         keyboard.row(team)
+    keyboard.row('Назад')
 
     return keyboard
