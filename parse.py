@@ -51,8 +51,11 @@ def clear_images() :
 
 
 #parses all information about next match
-def parse_next_match(parameter) :
-    url = "http://football.ua/club/165-sweden.html"
+def parse_next_match(team_name, parameter) :
+    with open('footlinks.json', 'r') as file:
+        data = json.load(file)
+        url = data[team_name]['foot_link']
+
     page = requests.get(url)
     html = page.text
 
@@ -90,8 +93,8 @@ def parse_next_match(parameter) :
 
 
 #parses general information about next match
-def parse_info() :
-    info = parse_next_match('info')
+def parse_info(team_name) :
+    info = parse_next_match(team_name, 'info')
 
     home = info[0]
     guest = info[1]
@@ -108,8 +111,8 @@ def parse_info() :
 
 
 #parse remaining time before next match
-def parse_time() :
-    date, time = parse_next_match('time')   #get time and date of next match
+def parse_time(team_name) :
+    date, time = parse_next_match(team_name, 'time')   #get time and date of next match
     day = int(date.split('.')[0])
     month = int(date.split('.')[1])
     year = int(date.split('.')[2])

@@ -42,14 +42,16 @@ class States(object):
 
     def next_match_state(self, message, first_entry=False):
         if first_entry:
-            self.bot.send_message(message.chat.id, parse.parse_info(),
+            user_id = message.chat.id
+            self.bot.send_message(user_id, parse.parse_info(users_controller.get_user(user_id).team),
                                   reply_markup=keyboards.set_return_keyboard())
         else:
             self.go_to_state(message, 'start')
 
     def time_state(self, message, first_entry=False):
         if first_entry:
-            self.bot.send_message(message.chat.id, parse.parse_time(),
+            user_id = message.chat.id
+            self.bot.send_message(user_id, parse.parse_time(users_controller.get_user(user_id).team),
                                   reply_markup=keyboards.set_return_keyboard())
         else:
             self.go_to_state(message, 'start')
