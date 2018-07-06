@@ -51,11 +51,17 @@ def clear_images() :
     os.chdir(BASE_DIR)
 
 
-#parses all information about next match
-def parse_next_match(team_name, parameter) :
+def get_team_foot_url(team_name):
     with open('footlinks.json', 'r') as file:
         data = json.load(file)
         url = data[team_name]['foot_link']
+
+    return url
+
+
+#parses all information about next match
+def parse_next_match(team_name, parameter) :
+    url = get_team_foot_url(team_name)
 
     page = requests.get(url)
     html = page.text
@@ -266,9 +272,7 @@ def parse_news(user_id):
 
     team_name = users_controller.get_user(user_id).team
 
-    with open('footlinks.json', 'r') as file:
-        data = json.load(file)
-        url = data[team_name]['foot_link']
+    url = get_team_foot_url(team_name)
 
     page = requests.get(url)
     html = page.text
