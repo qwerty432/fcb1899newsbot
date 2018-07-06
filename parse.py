@@ -7,6 +7,7 @@ from telegraph import Telegraph
 from telegraph.exceptions import TelegraphException
 from config import teletoken, BASE_DIR
 import json
+import users_controller
 
 #dict for endings (1 day, 3 days etc.)
 endings = {'days': 's', 'hours': 's', 'mins': 's'}
@@ -256,6 +257,36 @@ def parse_latest_news() :
     all_news['urls'] = urls
 
     return all_news
+
+
+def parse_news(user_id):
+    titles = []
+    urls = []
+    all_news = {}
+
+    team_name = users_controller.get_user(user_id).team
+
+    with open('footlinks.json', 'r') as file:
+        data = json.load(file)
+        url = data[team_name]['foot_link']
+
+    page = requests.get(url)
+    html = page.text
+
+    soup = BeautifulSoup(html, 'lxml')
+
+    news = soup.find('article', class_='news-feed')
+    other_news = news.find('ul').find_all('li', attrs={'class':None})[:10]
+
+    for article in other_news:
+        titles.append(article.get_text())
+        urls.append(article.find('a')['href'])
+
+    all_news['titles'] = titles
+    all_news['urls'] = urls
+
+    return all_news
+
 
 
 def get_football_link(name):
