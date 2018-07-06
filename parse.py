@@ -348,7 +348,8 @@ def get_teams_squad(user_id):
     team_name = users_controller.get_user(user_id).team
     url = get_team_foot_url(team_name)
 
-    squad_positions = ['Вратари', 'Защитники', 'Полузащитники', 'Нападающие']
+    message_text = ''
+    squad_positions = ['*Вратари:\n*', '*Защитники:\n*', '*Полузащитники:\n*', '*Нападающие:\n*']
 
     page = requests.get(url)
     html = page.text
@@ -357,5 +358,8 @@ def get_teams_squad(user_id):
 
     squad_block = soup.find('article', class_='team-consist')
 
-    for position_table in squad_block.find_all('table', class_='consist-table'):
-        print(position_table)
+
+    for i, position_table in enumerate(squad_block.find_all('table', class_='consist-table')):
+        message_text += squad_positions[i]
+
+    return message_text
