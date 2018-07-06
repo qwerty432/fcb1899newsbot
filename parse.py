@@ -279,7 +279,7 @@ def parse_news(user_id):
     other_news = news.find('ul').find_all('li', attrs={'class':None})[:10]
 
     for article in other_news:
-        titles.append(article.get_text())
+        titles.append(article.find('a').get_text())
         urls.append(article.find('a')['href'])
 
     all_news['titles'] = titles
