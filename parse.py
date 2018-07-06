@@ -342,3 +342,20 @@ def get_teams_list():
         teams_list = parse_teams()
 
     return teams_list
+
+
+def get_teams_squad(user_id):
+    team_name = users_controller.get_user(user_id).team
+    url = get_team_foot_url(team_name)
+
+    squad_positions = ['Вратари', 'Защитники', 'Полузащитники', 'Нападающие']
+
+    page = requests.get(url)
+    html = page.text
+
+    soup = BeautifulSoup(html, 'lxml')
+
+    squad_block = soup.find('article', class_='team-consist')
+
+    for position_table in squad_block.find_all('table', class_='consist-table'):
+        print(position_table)

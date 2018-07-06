@@ -32,6 +32,8 @@ class States(object):
             elif message.text == 'Новости':
                 self.bot.send_message(message.chat.id, 'Последние новости:',
                                       reply_markup=keyboards.set_news_buttons(message.chat.id))
+            elif message.text == 'Состав':
+                self.bot.send_message(message.chat.id, parse.get_teams_squad(message.chat.id))
             elif message.text == 'Время':
                 self.go_to_state(message, 'time_state')
             elif message.text == 'Настройки':

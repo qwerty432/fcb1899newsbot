@@ -21,7 +21,7 @@ def set_return_keyboard():
 def set_news_buttons(user_id):
     keyboard = types.InlineKeyboardMarkup()
 
-    news = parse.parse_latest_news()
+    news = parse.parse_news(user_id)
     titles = news['titles']
     users_controller.set_urls(user_id, news['urls'])
     for i, title in enumerate(titles) :
