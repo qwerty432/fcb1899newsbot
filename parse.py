@@ -362,4 +362,15 @@ def get_teams_squad(user_id):
     for i, position_table in enumerate(squad_block.find_all('table', class_='consist-table')):
         message_text += squad_positions[i]
 
+        footballers = position_table.find_all('tr')
+
+        for footballer in footballers:
+            num = footballer.find('td', class_='num').get_text()
+            name = footballer.find('a').get_text()
+            birth_date = footballer.find('td', class_='birth').find('p').get_text()
+
+            message_text += '{}. {} ({})\n'.format(num, name, birth_date)
+        message_text += '\n'
+
+
     return message_text
