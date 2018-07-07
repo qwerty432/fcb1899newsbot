@@ -16,7 +16,7 @@ endings = {'days': 's', 'hours': 's', 'mins': 's'}
 
 
 #download image by url to 'images' folder
-def download_image(url, name) :
+def download_image(url, name):
     r = requests.get(url, stream=True)
     if r.status_code == 200:
         with open(BASE_DIR + '/images/' + name, 'wb') as f:
@@ -34,7 +34,7 @@ def make_path(path):
 
 
 #prepares image for Instant View
-def prepare_image(image_url) :
+def prepare_image(image_url):
     image_name = image_url.split('/')[-1]
 
     download_image(image_url, image_name)
@@ -44,7 +44,7 @@ def prepare_image(image_url) :
     return p
 
 
-def clear_images() :
+def clear_images():
     os.chdir(BASE_DIR + '/images/')
     all_files = os.listdir()
     images = [os.remove(f) for f in all_files \
@@ -69,7 +69,7 @@ def get_countries_dict():
 
 
 #parses all information about next match
-def parse_next_match(team_name, parameter) :
+def parse_next_match(team_name, parameter):
     url = get_team_foot_url(team_name)
 
     page = requests.get(url)
@@ -101,15 +101,15 @@ def parse_next_match(team_name, parameter) :
                                       .replace(' ', '')\
                                       .replace('\n', '')
 
-    if parameter == 'time' :
+    if parameter == 'time':
         return next_match_date, next_match_time
-    elif parameter == 'info' :
+    elif parameter == 'info':
         return next_match_home, next_match_guest, next_match_tournament, \
                 next_match_stage, next_match_date, next_match_time
 
 
 #parses general information about next match
-def parse_info(team_name) :
+def parse_info(team_name):
     info = parse_next_match(team_name, 'info')
 
     home = info[0]
@@ -127,7 +127,7 @@ def parse_info(team_name) :
 
 
 #parse remaining time before next match
-def parse_time(team_name) :
+def parse_time(team_name):
     date, time = parse_next_match(team_name, 'time')   #get time and date of next match
     day = int(date.split('.')[0])
     month = int(date.split('.')[1])
@@ -141,11 +141,11 @@ def parse_time(team_name) :
 
     time_left = match_date - now    #calculate remaining time
 
-    # if int(days_left) == 1 :
+    # if int(days_left) == 1:
     #     endings['days'] = ''
-    # elif int(hours_left) == 1 :
+    # elif int(hours_left) == 1:
     #     endings['hours'] = ''
-    # elif int(minutes_left) == 1 :
+    # elif int(minutes_left) == 1:
     #     endings['mins'] = ''
 
     # print(endings['days'])
@@ -159,7 +159,7 @@ def parse_time(team_name) :
 
 
 #function for parsing article
-def parse_article(url, too_big=False) :
+def parse_article(url, too_big=False):
     content = ''
     page = requests.get(url)
     html = page.text
@@ -170,22 +170,22 @@ def parse_article(url, too_big=False) :
     title = article.find_all('h1')[0].text  #title of article
     paragraphs = article.find_all('p')[1:]  #all useful text from article
 
-    for p in paragraphs :
-        if 'img' in str(p) :
+    for p in paragraphs:
+        if 'img' in str(p):
             image_url = p.find('img')['src']    #get image's url
             p = prepare_image(image_url)    #create image path appr. for Telegraph
 
-        if('span' not in str(p)) :  #'span' tag is not allowed in telegraph
+        if('span' not in str(p)):  #'span' tag is not allowed in telegraph
             content += str(p)
 
-        if 'class="intro"' in str(p) :  #get article photo
+        if 'class="intro"' in str(p):  #get article photo
             image_url = article.find('div', class_='article-photo')\
                                .find('img')['src']
             p = prepare_image(image_url)
             content += str(p)
 
     #if article is too big we split it into two different Instant Views
-    if too_big :
+    if too_big:
         content_list = content.split('<p')  #split all paragraphs
         middle = int(len(content_list) / 2) #middle of all paragraphs
 
@@ -205,18 +205,18 @@ def parse_article(url, too_big=False) :
 
 
 #function for creating Instant View
-def create_instant_view(url) :
+def create_instant_view(url):
     telegraph = Telegraph(teletoken)
     too_big = False
 
     title, content = parse_article(url)
     clear_images()
 
-    try :
+    try:
         response = telegraph.create_page(title=title, html_content=content)
         return response['url']  #url of created telegraph page
 
-    except TelegraphException : #if article is too big
+    except TelegraphException: #if article is too big
         print("Oh no, something went wrong.")
         titles, contents = parse_article(url, too_big=True)
         clear_images()
@@ -229,7 +229,7 @@ def create_instant_view(url) :
         return [response1['url'], response2['url']]
 
 #parse 10 latest news about Barca
-def parse_latest_news() :
+def parse_latest_news():
     all_news = {}
     page_num = 1
     titles = []
@@ -244,7 +244,7 @@ def parse_latest_news() :
                 'Денис', 'Ракитич', 'Алькасер', 'Пако', 'Арнаис', 'Анонс', \
                 'Итоги']
 
-    while(len(urls) < 10) :
+    while(len(urls) < 10):
         main_url = 'http://football.ua/news/archive/spain/page{}.html'\
                                                         .format(page_num)
         page = requests.get(main_url)
@@ -255,13 +255,13 @@ def parse_latest_news() :
         news = soup.find('section', class_='news-archive')
         other_news = news.find('ul', class_='archive-list').find_all('li')
 
-        for article in other_news :
+        for article in other_news:
             flag = False
             title = article.find('h4').find('a')
             url = title['href']
             short_descr = article.find('a', class_='intro-text')
 
-            for keyword in keywords :
+            for keyword in keywords:
                 if keyword in str(title) and not flag and len(urls) < 10:
                     urls.append(url)
                     titles.append(title.text)
