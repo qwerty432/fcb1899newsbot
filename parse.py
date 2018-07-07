@@ -378,7 +378,11 @@ def get_teams_squad(user_id):
         for footballer in footballers:
             num = footballer.find('td', class_='num').get_text()
             name = footballer.find('a').get_text()
-            birth_date = footballer.find('td', class_='birth').find('p').get_text()
+            try:
+                birth_date = footballer.find('td', class_='birth').find('p').get_text()
+            except:
+                birth_date = 'не указано'
+                print('Birth date uknown')
             country_name = footballer.find('img')['alt']
 
             for key in countries_dict:
