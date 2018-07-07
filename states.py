@@ -78,7 +78,7 @@ class States(object):
         else:
             if message.text in parse.get_teams_list():
                 users_controller.set_team(message.chat.id, message.text)
-                self.go_to_state(message, 'settings_state')
+                self.go_to_state(message, 'start')
             elif message.text == 'Назад':
                 self.go_to_state(message, 'settings_state')
             else:

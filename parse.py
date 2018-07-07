@@ -9,7 +9,6 @@ from config import teletoken, BASE_DIR
 import json
 import users_controller
 import flag
-from pycountry import countries
 
 
 #dict for endings (1 day, 3 days etc.)
@@ -374,6 +373,7 @@ def get_teams_squad(user_id):
         message_text += squad_positions[i]
 
         footballers = position_table.find_all('tr')
+        country_emoji = ''
 
         for footballer in footballers:
             num = footballer.find('td', class_='num').get_text()
