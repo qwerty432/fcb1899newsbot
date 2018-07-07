@@ -8,6 +8,9 @@ from telegraph.exceptions import TelegraphException
 from config import teletoken, BASE_DIR
 import json
 import users_controller
+import flag
+from pycountry import countries
+
 
 #dict for endings (1 day, 3 days etc.)
 endings = {'days': 's', 'hours': 's', 'mins': 's'}
@@ -57,6 +60,13 @@ def get_team_foot_url(team_name):
         url = data[team_name]['foot_link']
 
     return url
+
+
+def get_countries_dict():
+    with open('country.json', 'r') as file:
+        data = json.load(file)
+
+    return data
 
 
 #parses all information about next match
@@ -369,8 +379,7 @@ def get_teams_squad(user_id):
             name = footballer.find('a').get_text()
             birth_date = footballer.find('td', class_='birth').find('p').get_text()
 
-            message_text += '{}. {} ({})\n'.format(num, name, birth_date)
+            message_text += '{}. {} (_{}_)\n'.format(num, name, birth_date)
         message_text += '\n'
-
 
     return message_text
