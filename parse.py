@@ -357,6 +357,7 @@ def get_teams_list():
 def get_teams_squad(user_id):
     team_name = users_controller.get_user(user_id).team
     url = get_team_foot_url(team_name)
+    countries_dict = get_countries_dict()
 
     message_text = ''
     squad_positions = ['*Вратари:\n*', '*Защитники:\n*', '*Полузащитники:\n*', '*Нападающие:\n*']
@@ -378,8 +379,14 @@ def get_teams_squad(user_id):
             num = footballer.find('td', class_='num').get_text()
             name = footballer.find('a').get_text()
             birth_date = footballer.find('td', class_='birth').find('p').get_text()
+            country_name = footballer.find('img')['alt']
 
-            message_text += '{}. {} (_{}_)\n'.format(num, name, birth_date)
+            for key in countries_dict:
+                if countries_dict[key] == country_name:
+                    country_code = key
+                    country_emoji = flag.flagize(':{}:'.format(country_code))
+
+            message_text += '{}. {} {} (_{}_)\n'.format(num, country_emoji, name, birth_date)
         message_text += '\n'
 
     return message_text
