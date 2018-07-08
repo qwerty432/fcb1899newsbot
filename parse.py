@@ -81,25 +81,17 @@ def parse_next_match(team_name, parameter):
     next_matches = soup.find_all('table', class_='feed-table')[1]\
                        .find_all('tr')
 
-    #scrapes info about when and in which tournament next match will be
-    next_match_where = next_matches[0].find('p').text\
-                                      .replace(' ', '')\
-                                      .replace('\r', '')\
-                                      .split('\n')[1:-1]
+    next_match_where = [' '.join(part.split()) for part in next_matches[0].find('p').get_text().split('\n')[1:-1]]
 
     next_match_date = next_match_where[0]
-    next_match_tournament = next_match_where[1].replace('.', '. ')
+    next_match_tournament = next_match_where[1]
     next_match_stage = next_match_where[2]
 
     #scrapes info about home and guest teams and time of the match
-    next_match_time = next_matches[1].find_all('td')[0].text
-    next_match_home = next_matches[1].find_all('td')[1].text\
-                                     .replace(' ', '')\
-                                     .replace('\n', '')
+    next_match_time = next_matches[1].find_all('td')[0].get_text()
+    next_match_home = ' '.join(next_matches[1].find_all('td')[1].get_text().split())
 
-    next_match_guest = next_matches[1].find_all('td')[3].text\
-                                      .replace(' ', '')\
-                                      .replace('\n', '')
+    next_match_guest = ' '.join(next_matches[1].find_all('td')[3].get_text().split())
 
     if parameter == 'time':
         return next_match_date, next_match_time
