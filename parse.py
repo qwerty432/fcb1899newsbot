@@ -77,27 +77,25 @@ def parse_next_match(team_name, parameter):
 
     soup = BeautifulSoup(html, 'lxml')
 
+    next_match = {}
+
     #scrapes next matches table
     next_matches = soup.find_all('table', class_='feed-table')[1]\
                        .find_all('tr')
 
     next_match_where = [' '.join(part.split()) for part in next_matches[0].find('p').get_text().split('\n')[1:-1]]
 
-    next_match_date = next_match_where[0]
-    next_match_tournament = next_match_where[1]
-    next_match_stage = next_match_where[2]
+    next_match['date'] = next_match_where[0]
+    next_match['tournament'] = next_match_where[1]
+    next_match['stage'] = next_match_where[2]
 
     #scrapes info about home and guest teams and time of the match
-    next_match_time = next_matches[1].find_all('td')[0].get_text()
-    next_match_home = ' '.join(next_matches[1].find_all('td')[1].get_text().split())
+    next_match['time'] = next_matches[1].find_all('td')[0].get_text()
+    next_match['home'] = ' '.join(next_matches[1].find_all('td')[1].get_text().split())
 
-    next_match_guest = ' '.join(next_matches[1].find_all('td')[3].get_text().split())
+    next_match['guest'] = ' '.join(next_matches[1].find_all('td')[3].get_text().split())
 
-    if parameter == 'time':
-        return next_match_date, next_match_time
-    elif parameter == 'info':
-        return next_match_home, next_match_guest, next_match_tournament, \
-                next_match_stage, next_match_date, next_match_time
+    return next_match
 
 
 #parses general information about next match
