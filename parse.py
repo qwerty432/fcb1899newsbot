@@ -9,6 +9,7 @@ from config import teletoken, BASE_DIR
 import json
 import users_controller
 import flag
+from collections import defaultdict
 
 
 #dict for endings (1 day, 3 days etc.)
@@ -109,7 +110,22 @@ def parse_info(team_name):
 
 #parse remaining time before next match
 def parse_time(team_name):
-    date, time = parse_next_match(team_name, 'time')   #get time and date of next match
+    next_match = parse_next_match(team_name)
+    date, time = next_match['date'], next_match['time']
+
+    minutes_dict = {1: 'минута'}
+    hours_dict = {1: 'час'}
+    days_dict = {1: 'день'}
+
+    for i in range(2, 5):
+        minutes_dict[i] = 'минуты'
+        hours_dict[i] = 'часа'
+        days_dict[i] = 'дня'
+
+    minutes_dict = defaultdict(lambda: 'минут', minutes_dict)
+    hours_dict = defaultdict(lambda: 'часов', hours_dict)
+    days_dict = defaultdict(lambda: 'дней', days_dict)
+
     day = int(date.split('.')[0])
     month = int(date.split('.')[1])
     year = int(date.split('.')[2])
@@ -122,21 +138,14 @@ def parse_time(team_name):
 
     time_left = match_date - now    #calculate remaining time
 
-    # if int(days_left) == 1:
-    #     endings['days'] = ''
-    # elif int(hours_left) == 1:
-    #     endings['hours'] = ''
-    # elif int(minutes_left) == 1:
-    #     endings['mins'] = ''
+    hours = time_left.seconds // 3600
+    minutes = hours // 60
 
-    # print(endings['days'])
+    message_text = 'Осталось {} {}, {} {}, {} {}'.format(time_left.days, days_dict[time_left.days],
+                                                         hours, hours_dict[hours],
+                                                         minutes, minutes_dict[minutes])
 
-    # time = "Time to next match: {} day{}, {} hour{} {} minute{}".\
-    #     format(days_left, endings['days'], hours_left, \
-    #             endings['hours'], minutes_left, endings['mins'])
-    # print(time)
-
-    return time_left
+    return message_text
 
 
 #function for parsing article
