@@ -228,51 +228,6 @@ def create_instant_view(url):
         #urls of created telegraph pages
         return [response1['url'], response2['url']]
 
-#parse 10 latest news about Barca
-def parse_latest_news():
-    all_news = {}
-    page_num = 1
-    titles = []
-    urls = []
-
-    #keywords of which searching Barca news
-    keywords = ['Барселона', 'Вальверде', 'Месси', 'Неймар', 'Суарес', \
-                'Иньеста', 'Букскетс', 'Дембеле', 'Коутиньо', 'Паулиньо', \
-                'Тер Стеген', 'Альба', 'Пике', 'Умтити', 'Роберто', 'Гомеш', \
-                'Бартомеу', 'Каталония', 'Камп Ноу', 'Силессен', 'Мина', \
-                'Видаль', 'Динь', 'Семеду', 'Вермален', 'Денис Суарес',\
-                'Денис', 'Ракитич', 'Алькасер', 'Пако', 'Арнаис', 'Анонс', \
-                'Итоги']
-
-    while(len(urls) < 10):
-        main_url = 'http://football.ua/news/archive/spain/page{}.html'\
-                                                        .format(page_num)
-        page = requests.get(main_url)
-        html = page.text
-
-        soup = BeautifulSoup(html, 'lxml')
-
-        news = soup.find('section', class_='news-archive')
-        other_news = news.find('ul', class_='archive-list').find_all('li')
-
-        for article in other_news:
-            flag = False
-            title = article.find('h4').find('a')
-            url = title['href']
-            short_descr = article.find('a', class_='intro-text')
-
-            for keyword in keywords:
-                if keyword in str(title) and not flag and len(urls) < 10:
-                    urls.append(url)
-                    titles.append(title.text)
-                    flag = True
-        page_num += 1
-
-    all_news['titles'] = titles
-    all_news['urls'] = urls
-
-    return all_news
-
 
 def parse_news(user_id):
     titles = []
