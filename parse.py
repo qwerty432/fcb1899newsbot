@@ -69,7 +69,7 @@ def get_countries_dict():
 
 
 #parses all information about next match
-def parse_next_match(team_name, parameter):
+def parse_next_match(team_name):
     url = get_team_foot_url(team_name)
 
     page = requests.get(url)
@@ -100,20 +100,11 @@ def parse_next_match(team_name, parameter):
 
 #parses general information about next match
 def parse_info(team_name):
-    info = parse_next_match(team_name, 'info')
+    next_match = parse_next_match(team_name)
 
-    home = info[0]
-    guest = info[1]
-
-    tournament = info[2]
-    stage = info[3]
-
-    date = info[4]
-    time = info[5]
-
-    return "📌 Следующий матч:\n⚽ {} — {}\n🏆 {}, {}\n📅 {}, {}"\
-                                .format(home, guest, tournament, \
-                                        stage, date, time)
+    return "📌 *Следующий матч*\n⚽ {} — {}\n🏆 {}, {}\n📅 {}, {}"\
+                                .format(next_match['home'], next_match['guest'], next_match['tournament'], \
+                                        next_match['stage'], next_match['date'], next_match['time'])
 
 
 #parse remaining time before next match

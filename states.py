@@ -47,7 +47,8 @@ class States(object):
         if first_entry:
             user_id = message.chat.id
             self.bot.send_message(user_id, parse.parse_info(users_controller.get_user(user_id).team),
-                                  reply_markup=keyboards.set_return_keyboard())
+                                  reply_markup=keyboards.set_return_keyboard(),
+                                  parse_mode='markdown')
         else:
             self.go_to_state(message, 'start')
 
