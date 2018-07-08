@@ -113,19 +113,6 @@ def parse_time(team_name):
     next_match = parse_next_match(team_name)
     date, time = next_match['date'], next_match['time']
 
-    minutes_dict = {1: 'минута'}
-    hours_dict = {1: 'час'}
-    days_dict = {1: 'день'}
-
-    for i in range(2, 5):
-        minutes_dict[i] = 'минуты'
-        hours_dict[i] = 'часа'
-        days_dict[i] = 'дня'
-
-    minutes_dict = defaultdict(lambda: 'минут', minutes_dict)
-    hours_dict = defaultdict(lambda: 'часов', hours_dict)
-    days_dict = defaultdict(lambda: 'дней', days_dict)
-
     day = int(date.split('.')[0])
     month = int(date.split('.')[1])
     year = int(date.split('.')[2])
@@ -139,13 +126,41 @@ def parse_time(team_name):
     time_left = match_date - now    #calculate remaining time
 
     hours = time_left.seconds // 3600
-    minutes = hours // 60
+    minutes = (time_left.seconds % 3600) // 60
 
-    message_text = 'Осталось {} {}, {} {}, {} {}'.format(time_left.days, days_dict[time_left.days],
-                                                         hours, hours_dict[hours],
-                                                         minutes, minutes_dict[minutes])
+    endings = get_endings(time_left.days, hours, minutes)
+
+    message_text = 'До следующего матча {} {} {}, {} {}, {} {}'.format(endings[0],
+                                                         time_left.days, endings[1],
+                                                         hours, endings[2],
+                                                         minutes, endings[3])
 
     return message_text
+
+
+def get_endings(*values):
+    endings = []
+    left_message = ['остался', 'осталось']
+    values_end_with_1 = ['день', 'час', 'минута']
+    values_end_with_234 = ['дня', 'часа', 'минуты']
+    other_values = ['дней', 'часов', 'минут']
+
+    for i, value in enumerate(values):
+        remainder = value % 10
+        if remainder == 1:
+            if i == 0:
+                endings.append(left_message[0])
+            endings.append(values_end_with_1[i])
+        elif remainder in range(2, 5):
+            if i == 0:
+                endings.append(left_message[1])
+            endings.append(values_end_with_234[i])
+        else:
+            if i == 0:
+                endings.append(left_message[1])
+            endings.append(other_values[i])
+
+    return endings
 
 
 #function for parsing article
