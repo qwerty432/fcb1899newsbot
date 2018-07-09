@@ -12,10 +12,6 @@ import flag
 from collections import defaultdict
 
 
-#dict for endings (1 day, 3 days etc.)
-endings = {'days': 's', 'hours': 's', 'mins': 's'}
-
-
 #download image by url to 'images' folder
 def download_image(url, name):
     r = requests.get(url, stream=True)
@@ -174,6 +170,16 @@ def parse_article(url, too_big=False):
 
     title = article.find_all('h1')[0].text  #title of article
     paragraphs = article.find_all('p')[1:]  #all useful text from article
+
+    header = article.find('div', class_='news-header-top')
+    if header:
+        img = header.find('img')
+        if img:
+            try:
+                image = prepare_image(img['src'])
+            except:
+                image = prepare_image('/'.join(url.split('/')[:3]) + img['src'])
+            content += str(image)
 
     for p in paragraphs:
         if 'img' in str(p):
