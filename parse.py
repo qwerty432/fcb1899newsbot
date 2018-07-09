@@ -9,45 +9,6 @@ from config import teletoken, BASE_DIR
 import json
 import users_controller
 import flag
-from collections import defaultdict
-
-
-#download image by url to 'images' folder
-def download_image(url, name):
-    r = requests.get(url, stream=True)
-    if r.status_code == 200:
-        with open(BASE_DIR + '/images/' + name, 'wb') as f:
-            f.write(r.content)
-
-
-#makes new path of image appropriate for telegraph
-def make_path(path):
-    with open(path, 'rb') as f:
-        new_path = requests.post(
-                'http://telegra.ph/upload', files={'file':
-                                                    ('file', f,
-                                                    'image/jpeg')}).json()
-    return new_path[0]['src']
-
-
-#prepares image for Instant View
-def prepare_image(image_url):
-    image_name = image_url.split('/')[-1]
-
-    download_image(image_url, image_name)
-
-    new_path = make_path('images/{}'.format(image_name))
-    p = '<img src="{}"/>'.format(new_path)  #creates paragraph tag with image
-    return p
-
-
-def clear_images():
-    os.chdir(BASE_DIR + '/images/')
-    all_files = os.listdir()
-    images = [os.remove(f) for f in all_files \
-                                            if f.endswith('.jpg')\
-                                            or f.endswith('.png')]
-    os.chdir(BASE_DIR)
 
 
 def get_team_foot_url(team_name):
@@ -163,6 +124,8 @@ def get_endings(*values):
 def parse_article(url, too_big=False):
     content = ''
     page = requests.get(url)
+    url = page.url
+
     html = page.text
 
     soup = BeautifulSoup(html, 'lxml')
@@ -175,16 +138,12 @@ def parse_article(url, too_big=False):
     if header:
         img = header.find('img')
         if img:
-            try:
-                image = prepare_image(img['src'])
-            except:
-                image = prepare_image('/'.join(url.split('/')[:3]) + img['src'])
-            content += str(image)
+            content += "<img src='{}'></img>".format('/'.join(url.split('/')[:3]) + img['src'])
 
     for p in paragraphs:
         if 'img' in str(p):
             image_url = p.find('img')['src']    #get image's url
-            p = prepare_image(image_url)    #create image path appr. for Telegraph
+            content += "<img src='{}'></img>".format(image_url)    #create image path appr. for Telegraph
 
         if('span' not in str(p)):  #'span' tag is not allowed in telegraph
             content += str(p)
@@ -192,7 +151,7 @@ def parse_article(url, too_big=False):
         if 'class="intro"' in str(p):  #get article photo
             image_url = article.find('div', class_='article-photo')\
                                .find('img')['src']
-            p = prepare_image(image_url)
+            content += "<img src='{}'></img>".format(image_url)
             content += str(p)
 
     #if article is too big we split it into two different Instant Views
@@ -221,7 +180,6 @@ def create_instant_view(url):
     too_big = False
 
     title, content = parse_article(url)
-    clear_images()
 
     try:
         response = telegraph.create_page(title=title, html_content=content)
@@ -230,7 +188,6 @@ def create_instant_view(url):
     except TelegraphException: #if article is too big
         print("Oh no, something went wrong.")
         titles, contents = parse_article(url, too_big=True)
-        clear_images()
 
         response1 = telegraph.create_page(title=titles[0],
                                           html_content=contents[0])
