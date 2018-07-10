@@ -159,18 +159,21 @@ def parse_article(url, too_big=False):
             content += "<img src='{}'></img>".format('/'.join(url.split('/')[:3]) + img['src'])
 
     for p in paragraphs:
-        if 'img' in str(p):
+        if 'class="intro"' in str(p):  #get article photo
+            try:
+                image_url = article.find('div', class_='article-photo').find('img')['src']
+                content += "<img src='{}'></img>".format(image_url)
+            except:
+                print('No article photo')
+            content += p.get_text()
+
+        elif 'img' in str(p):
             image_url = p.find('img')['src']    #get image's url
             content += "<img src='{}'></img>".format(image_url)    #create image path appr. for Telegraph
 
-        if('span' not in str(p)):  #'span' tag is not allowed in telegraph
+        elif('span' not in str(p)):  #'span' tag is not allowed in telegraph
             content += str(p)
 
-        if 'class="intro"' in str(p):  #get article photo
-            image_url = article.find('div', class_='article-photo')\
-                               .find('img')['src']
-            content += "<img src='{}'></img>".format(image_url)
-            content += str(p)
 
     #if article is too big we split it into two different Instant Views
     if too_big:
@@ -181,8 +184,6 @@ def parse_article(url, too_big=False):
 
         content_list[middle] = '<p' + content_list[middle]
         content2 = '<p'.join(content_list[middle:]) #second page
-
-        print(content2)
 
         titles = [title + '. Part1', title + '. Part2'] #titles for 2 pages
         content = [content1, content2]
@@ -240,6 +241,33 @@ def parse_news(user_id):
     all_news['urls'] = urls
 
     return all_news
+
+
+def parse_articles(user_id):
+    titles = []
+    urls = []
+    all_articles = {}
+
+    team_name = users_controller.get_user(user_id).team
+
+    url = get_team_foot_url(team_name)
+
+    page = requests.get(url)
+    html = page.text
+
+    soup = BeautifulSoup(html, 'lxml')
+
+    articles_block = soup.find('ul', class_='archive-list')
+    articles = articles_block.find_all('li')
+
+    for article in articles:
+        titles.append(article.find('h4').find('a').get_text())
+        urls.append(article.find('h4').find('a')['href'])
+
+    all_articles['titles'] = titles
+    all_articles['urls'] = urls
+
+    return all_articles
 
 
 def get_football_link(name):
