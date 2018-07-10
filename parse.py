@@ -8,6 +8,7 @@ from config import teletoken, BASE_DIR
 import json
 import users_controller
 import flag
+import keyboards
 
 
 def get_team_foot_url(team_name):
@@ -216,7 +217,7 @@ def create_instant_view(url):
         return [response1['url'], response2['url']]
 
 
-def parse_news(user_id):
+def send_news(self, user_id):
     titles = []
     urls = []
     all_news = {}
@@ -231,19 +232,23 @@ def parse_news(user_id):
     soup = BeautifulSoup(html, 'lxml')
 
     news = soup.find('article', class_='news-feed')
-    other_news = news.find('ul').find_all('li', attrs={'class':None})[:10]
 
-    for article in other_news:
-        titles.append(article.find('a').get_text())
-        urls.append(article.find('a')['href'])
+    try:
+        other_news = news.find('ul').find_all('li', attrs={'class':None})[:10]
 
-    all_news['titles'] = titles
-    all_news['urls'] = urls
+        for article in other_news:
+            titles.append(article.find('a').get_text())
+            urls.append(article.find('a')['href'])
+            all_news['titles'] = titles
+            all_news['urls'] = urls
 
-    return all_news
+        self.bot.send_message(user_id, 'Последние новости:',
+                              reply_markup=keyboards.set_news_buttons(all_news))
+    except:
+        self.bot.send_message(user_id, 'Здесь пока нет новостей')
 
 
-def parse_articles(user_id):
+def send_articles(self, user_id):
     titles = []
     urls = []
     all_articles = {}
@@ -258,16 +263,22 @@ def parse_articles(user_id):
     soup = BeautifulSoup(html, 'lxml')
 
     articles_block = soup.find('ul', class_='archive-list')
-    articles = articles_block.find_all('li')
 
-    for article in articles:
-        titles.append(article.find('h4').find('a').get_text())
-        urls.append(article.find('h4').find('a')['href'])
+    try:
+        articles = articles_block.find_all('li')
 
-    all_articles['titles'] = titles
-    all_articles['urls'] = urls
+        for article in articles:
+            titles.append(article.find('h4').find('a').get_text())
+            urls.append(article.find('h4').find('a')['href'])
 
-    return all_articles
+        all_articles['titles'] = titles
+        all_articles['urls'] = urls
+
+        self.bot.send_message(user_id, 'Статьи',
+                              reply_markup=keyboards.set_news_buttons(all_articles))
+
+    except:
+        self.bot.send_message(user_id, 'Здесь пока нет статей')
 
 
 def get_football_link(name):
