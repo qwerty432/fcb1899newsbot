@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, date
-import os
 import requests
 from bs4 import BeautifulSoup
 from telegraph import Telegraph
@@ -38,8 +37,11 @@ def parse_next_match(team_name):
     next_match = {}
 
     #scrapes next matches table
-    next_matches = soup.find_all('table', class_='feed-table')[1]\
-                       .find_all('tr')
+    try:
+        next_matches = soup.find_all('table', class_='feed-table')[1]\
+                           .find_all('tr')
+    except IndexError:
+        return None
 
     next_match_where = [' '.join(part.split()) for part in next_matches[0].find('p').get_text().split('\n')[1:-1]]
 
@@ -60,9 +62,13 @@ def parse_next_match(team_name):
 def parse_info(team_name):
     next_match = parse_next_match(team_name)
 
-    return "📌 *Следующий матч*\n⚽ {} — {}\n🏆 {}, {}\n📅 {}, {}"\
-                                .format(next_match['home'], next_match['guest'], next_match['tournament'], \
-                                        next_match['stage'], next_match['date'], next_match['time'])
+    if next_match is not None:
+        return "📌 *Следующий матч*\n⚽ {} — {}\n🏆 {}, {}\n📅 {}, {}"\
+                                    .format(next_match['home'], next_match['guest'], next_match['tournament'], \
+                                    next_match['stage'], next_match['date'], next_match['time'])
+    else:
+        return "Дата следующего матча неизвестна"
+
 
 
 #parse remaining time before next match
@@ -222,7 +228,6 @@ def parse_news(user_id):
     all_news['urls'] = urls
 
     return all_news
-
 
 
 def get_football_link(name):
