@@ -29,6 +29,8 @@ class States(object):
         else:
             if message.text == 'Следующий матч':
                 self.go_to_state(message, 'next_match_state')
+            elif message.text == 'Последний матч':
+                self.bot.send_message(message.chat.id, 'Последний матч')
             elif message.text == 'Новости':
                 self.bot.send_message(message.chat.id, 'Последние новости:',
                                       reply_markup=keyboards.set_news_buttons(message.chat.id))
