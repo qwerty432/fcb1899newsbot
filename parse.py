@@ -26,46 +26,58 @@ def get_countries_dict():
 
 
 #parses all information about next match
-def parse_next_match(team_name):
+def parse_match(team_name, match='next'):
     url = get_team_foot_url(team_name)
+
+    if match == 'next':
+        table_num = 1
+        match_index = 0
+    else:
+        table_num = 0
+        match_index = -2
 
     page = requests.get(url)
     html = page.text
 
     soup = BeautifulSoup(html, 'lxml')
 
-    next_match = {}
+    match = {}
 
     #scrapes next matches table
     try:
-        next_matches = soup.find_all('table', class_='feed-table')[1]\
+        matches = soup.find_all('table', class_='feed-table')[table_num]\
                            .find_all('tr')
     except IndexError:
         return None
 
-    next_match_where = [' '.join(part.split()) for part in next_matches[0].find('p').get_text().split('\n')[1:-1]]
+    match_where = [' '.join(part.split()) for part in matches[match_index].find('p').get_text().split('\n')[1:-1]]
 
-    next_match['date'] = next_match_where[0]
-    next_match['tournament'] = next_match_where[1]
-    next_match['stage'] = next_match_where[2]
+    match['date'] = match_where[0]
+    match['tournament'] = match_where[1]
+    match['stage'] = match_where[2]
 
     #scrapes info about home and guest teams and time of the match
-    next_match['time'] = next_matches[1].find_all('td')[0].get_text()
-    next_match['home'] = ' '.join(next_matches[1].find_all('td')[1].get_text().split())
+    match['time'] = matches[1].find_all('td')[0].get_text()
+    match['home'] = ' '.join(matches[match_index + 1].find_all('td')[1].get_text().split())
+    match['guest'] = ' '.join(matches[match_index + 1].find_all('td')[3].get_text().split())
+    match['score'] = ' '.join(matches[match_index + 1].find_all('td')[2].get_text().split())
 
-    next_match['guest'] = ' '.join(next_matches[1].find_all('td')[3].get_text().split())
-
-    return next_match
+    return match
 
 
 #parses general information about next match
-def parse_info(team_name):
-    next_match = parse_next_match(team_name)
+def parse_info(team_name, match='next'):
+    match = parse_match(team_name, match)
 
-    if next_match is not None:
-        return "📌 *Следующий матч*\n⚽ {} — {}\n🏆 {}, {}\n📅 {}, {}"\
-                                    .format(next_match['home'], next_match['guest'], next_match['tournament'], \
-                                    next_match['stage'], next_match['date'], next_match['time'])
+    if match == 'next':
+        match_string = 'Следующий'
+    else:
+        match_string = 'Последний'
+
+    if match is not None:
+        return "📌 *{} матч*\n⚽ {} {} {}\n🏆 {}, {}\n📅 {}, {}"\
+                                    .format(match_string, match['home'], match['score'], match['guest'], match['tournament'], \
+                                    match['stage'], match['date'], match['time'])
     else:
         return "Дата следующего матча неизвестна"
 
@@ -73,7 +85,7 @@ def parse_info(team_name):
 
 #parse remaining time before next match
 def parse_time(team_name):
-    next_match = parse_next_match(team_name)
+    next_match = parse_match(team_name, match='next')
     date, time = next_match['date'], next_match['time']
 
     day = int(date.split('.')[0])

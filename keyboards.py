@@ -5,7 +5,7 @@ import users_controller
 
 def set_main_keyboard():
     keyboard = types.ReplyKeyboardMarkup(True)
-    keyboard.row('Следующий матч', 'Последний матч')
+    keyboard.row('Последний матч', 'Следующий матч')
     keyboard.row('Время', 'Состав')
     keyboard.row('Новости')
     keyboard.row('Настройки')
