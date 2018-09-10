@@ -96,9 +96,9 @@ class States(object):
     def choose_team_state(self, message, first_entry=False):
         if first_entry:
             self.bot.send_message(message.chat.id, 'Выберите команду:',
-                                  reply_markup=keyboards.set_teams_keyboard())
+                                  reply_markup=keyboards.set_teams_keyboard(message.chat.id))
         else:
-            if message.text in parse.get_teams_list():
+            if message.text in parse.get_teams_list(message.chat.id):
                 users_controller.set_team(message.chat.id, message.text)
                 self.go_to_state(message, 'start')
             elif message.text == 'Назад':

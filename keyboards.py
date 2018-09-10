@@ -65,10 +65,10 @@ def set_champs_keyboard():
     return keyboard
 
 
-def set_teams_keyboard():
+def set_teams_keyboard(user_id):
     keyboard = types.ReplyKeyboardMarkup(True)
 
-    teams = parse.get_teams_list()
+    teams = parse.get_teams_list(user_id)
 
     for i, team in enumerate(teams):
         keyboard.row(team)

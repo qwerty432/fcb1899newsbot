@@ -9,6 +9,7 @@ import json
 import users_controller
 import flag
 import keyboards
+from useful_dictionaries import *
 
 
 def get_team_foot_url(team_name):
@@ -233,19 +234,19 @@ def send_news(self, user_id):
 
     news = soup.find('article', class_='news-feed')
 
-    try:
-        other_news = news.find('ul').find_all('li', attrs={'class':None})[:10]
+    # try:
+    other_news = news.find('ul').find_all('li', attrs={'class':None})[:10]
 
-        for article in other_news:
-            titles.append(article.find('a').get_text())
-            urls.append(article.find('a')['href'])
-            all_news['titles'] = titles
-            all_news['urls'] = urls
+    for article in other_news:
+        titles.append(article.find('a').get_text())
+        urls.append(article.find('a')['href'])
+        all_news['titles'] = titles
+        all_news['urls'] = urls
 
-        self.bot.send_message(user_id, 'Последние новости:',
-                              reply_markup=keyboards.set_news_buttons(all_news))
-    except:
-        self.bot.send_message(user_id, 'Здесь пока нет новостей')
+    self.bot.send_message(user_id, 'Последние новости:',
+                          reply_markup=keyboards.set_news_buttons(all_news))
+    # except:
+    #     self.bot.send_message(user_id, 'Здесь пока нет новостей')
 
 
 def send_articles(self, user_id):
@@ -292,7 +293,7 @@ def get_football_link(name):
     return link
 
 
-def parse_teams():
+def parse_teams_for_world_cup():
     teams_dict = {}
     url = 'https://2018.football.ua'
     page = requests.get(url + '/teams')
@@ -320,16 +321,26 @@ def parse_teams():
     return sorted([team for team in teams_dict])
 
 
-def get_teams_list():
-    teams_list = []
-    try:
-        with open('footlinks.json', 'r') as file:
-            data = json.load(file)
-            teams_list = sorted([team for team in data])
-    except FileNotFoundError:
-        teams_list = parse_teams()
+def get_teams_list(user_id):
+    # teams_list = []
+    # try:
+    #     with open('footlinks.json', 'r') as file:
+    #         data = json.load(file)
+    #         teams_list = sorted([team for team in data])
+    # except FileNotFoundError:
+    #     teams_list = parse_teams()
 
-    return teams_list
+    champ_name = users_controller.get_user(user_id).champ
+    url = CHAMPIONATS_DICT[champ_name]
+
+    page = requests.get(url)
+    html = page.text
+
+    soup = BeautifulSoup(html, 'lxml')
+
+    teams = [team['alt'] for team in soup.find('section', class_='top-teams').find_all('img')]
+
+    return teams
 
 
 def get_teams_squad(user_id):
