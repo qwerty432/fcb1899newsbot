@@ -1,6 +1,7 @@
 import users_controller
 import keyboards
 import parse
+from useful_dictionaries import *
 
 
 class States(object):
@@ -8,7 +9,8 @@ class States(object):
         self.bot = bot
         self.states = {'start': self.start_state, 'next_match_state': self.next_match_state,
                        'time_state': self.time_state, 'settings_state': self.settings_state,
-                       'choose_team_state': self.choose_team_state}
+                       'choose_team_state': self.choose_team_state, 'choose_champ_state': self.choose_champ_state
+                       }
 
     def handle_states(self, message, first_entry=False):
         user = users_controller.get_user(message.chat.id)
@@ -72,11 +74,24 @@ class States(object):
                                   reply_markup=keyboards.set_settings_keyboard())
         else:
             if message.text == 'Выбрать команду':
-                self.go_to_state(message, 'choose_team_state')
+                self.go_to_state(message, 'choose_champ_state')
             elif message.text == 'Назад':
                 self.go_to_state(message, 'start')
             else:
                 self.go_to_state(message, 'settings_state')
+
+    def choose_champ_state(self, message, first_entry=False):
+        if first_entry:
+            self.bot.send_message(message.chat.id, 'Выберите чемпионат:',
+                                  reply_markup=keyboards.set_champs_keyboard())
+        else:
+            if message.text in CHAMPIONATS_DICT.keys():
+                users_controller.set_champ(message.chat.id, message.text)
+                self.go_to_state(message, 'choose_team_state')
+            elif message.text == 'Назад':
+                self.go_to_state(message, 'settings_state')
+            else:
+                self.go_to_state(message, 'choose_champ_state')
 
     def choose_team_state(self, message, first_entry=False):
         if first_entry:

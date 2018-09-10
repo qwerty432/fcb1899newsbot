@@ -11,6 +11,7 @@ def create_user_table():
             Column('id', Integer, primary_key=True),
             Column('username', String),
             Column('state', String(50)),
+            Column('champ', String(20)),
             Column('team', String(20)),
             Column('news_urls', ARRAY(String), default=[])
             )
@@ -87,5 +88,12 @@ def set_urls(user_id, urls):
 def set_team(user_id, team_name):
     users = meta.tables['users']
     query = users.update().where(users.c.id == user_id).values(team=team_name)
+
+    con.execute(query)
+
+
+def set_champ(user_id, champ):
+    users = meta.tables['users']
+    query = users.update().where(users.c.id == user_id).values(champ=champ)
 
     con.execute(query)

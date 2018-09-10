@@ -1,6 +1,7 @@
 from telebot import types
 import parse
 import users_controller
+from useful_dictionaries import *
 
 
 def set_main_keyboard():
@@ -51,6 +52,16 @@ def set_settings_keyboard():
 
     keyboard.row('Выбрать команду')
     keyboard.row('Назад')
+    return keyboard
+
+
+def set_champs_keyboard():
+    keyboard = types.ReplyKeyboardMarkup(True)
+
+    for i, team in enumerate(sorted(CHAMPIONATS_DICT.keys())):
+        keyboard.row(team)
+    keyboard.row('Назад')
+
     return keyboard
 
 
