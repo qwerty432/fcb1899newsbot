@@ -7,8 +7,7 @@ from useful_dictionaries import *
 class States(object):
     def __init__(self, bot):
         self.bot = bot
-        self.states = {'start': self.start_state, 'next_match_state': self.next_match_state,
-                       'time_state': self.time_state, 'settings_state': self.settings_state,
+        self.states = {'start': self.start_state, 'settings_state': self.settings_state,
                        'choose_team_state': self.choose_team_state, 'choose_champ_state': self.choose_champ_state
                        }
 
@@ -30,11 +29,13 @@ class States(object):
                                   reply_markup=keyboards.set_main_keyboard())
         else:
             if message.text == 'Следующий матч':
-                self.go_to_state(message, 'next_match_state')
+                self.bot.send_message(message.chat.id,
+                                      parse.parse_info(users_controller.get_user(message.chat.id)),
+                                      parse_mode='markdown')
             elif message.text == 'Последний матч':
                 self.bot.send_message(message.chat.id,
                                       parse.parse_info(users_controller.get_user(message.chat.id),
-                                                       match='last'),
+                                                       match_type='last'),
                                       parse_mode='markdown')
             elif message.text == 'Новости':
                 parse.send_news(self, message.chat.id)
@@ -44,29 +45,12 @@ class States(object):
                 self.bot.send_message(message.chat.id, parse.get_teams_squad(message.chat.id),
                                       parse_mode='markdown')
             elif message.text == 'Время':
-                self.go_to_state(message, 'time_state')
+                self.bot.send_message(message.chat.id, parse.parse_time(users_controller.get_user(message.chat.id)))
             elif message.text == 'Настройки':
                 self.go_to_state(message, 'settings_state')
             else:
                 self.bot.send_message(message.chat.id, 'Hello there!',
                                       reply_markup=keyboards.set_main_keyboard())
-
-    def next_match_state(self, message, first_entry=False):
-        if first_entry:
-            user_id = message.chat.id
-            self.bot.send_message(user_id, parse.parse_info(users_controller.get_user(user_id)),
-                                  reply_markup=keyboards.set_return_keyboard(),
-                                  parse_mode='markdown')
-        else:
-            self.go_to_state(message, 'start')
-
-    def time_state(self, message, first_entry=False):
-        if first_entry:
-            user_id = message.chat.id
-            self.bot.send_message(user_id, parse.parse_time(users_controller.get_user(user_id)),
-                                  reply_markup=keyboards.set_return_keyboard())
-        else:
-            self.go_to_state(message, 'start')
 
     def settings_state(self, message, first_entry=False):
         if first_entry:

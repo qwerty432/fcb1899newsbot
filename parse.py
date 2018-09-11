@@ -76,10 +76,10 @@ def parse_match(champ_name, team_name, match='next'):
 
 
 #parses general information about next match
-def parse_info(user, match='next'):
-    match = parse_match(user.champ, user.team, match)
+def parse_info(user, match_type='next'):
+    match = parse_match(user.champ, user.team, match_type)
 
-    if match == 'next':
+    if match_type == 'next':
         match_string = 'Следующий'
     else:
         match_string = 'Последний'
