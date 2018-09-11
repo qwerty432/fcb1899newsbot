@@ -19,10 +19,10 @@ def set_return_keyboard():
     return keyboard
 
 
-def set_news_buttons(news):
+def set_news_buttons(user_id, news):
     keyboard = types.InlineKeyboardMarkup()
     titles = news['titles']
-    # users_controller.set_urls(user_id, news['urls'])
+    users_controller.set_urls(user_id, news['urls'])
     for i, title in enumerate(titles) :
         button = types.InlineKeyboardButton(
                                     text=title,

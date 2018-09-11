@@ -12,12 +12,20 @@ import keyboards
 from useful_dictionaries import *
 
 
-def get_team_foot_url(team_name):
-    with open('footlinks.json', 'r') as file:
-        data = json.load(file)
-        url = data[team_name]['foot_link']
+def get_team_foot_url(champ_name, team_name):
+    # with open('footlinks.json', 'r') as file:
+    #     data = json.load(file)
+    #     url = data[team_name]['foot_link']
 
-    return url
+    url = CHAMPIONATS_DICT[champ_name]
+    page = requests.get(url)
+    html = page.text
+
+    soup = BeautifulSoup(html, 'lxml')
+
+    team_url = [team['href'] for team in soup.find('section', class_='top-teams').find_all('a') if team.find('img')['alt'] == team_name][0]
+
+    return team_url
 
 
 def get_countries_dict():
@@ -223,9 +231,9 @@ def send_news(self, user_id):
     urls = []
     all_news = {}
 
-    team_name = users_controller.get_user(user_id).team
+    user = users_controller.get_user(user_id)
 
-    url = get_team_foot_url(team_name)
+    url = get_team_foot_url(user.champ, user.team)
 
     page = requests.get(url)
     html = page.text
@@ -234,19 +242,19 @@ def send_news(self, user_id):
 
     news = soup.find('article', class_='news-feed')
 
-    # try:
-    other_news = news.find('ul').find_all('li', attrs={'class':None})[:10]
+    try:
+        other_news = news.find('ul').find_all('li', attrs={'class':None})[:10]
 
-    for article in other_news:
-        titles.append(article.find('a').get_text())
-        urls.append(article.find('a')['href'])
-        all_news['titles'] = titles
-        all_news['urls'] = urls
+        for article in other_news:
+            titles.append(article.find('a').get_text())
+            urls.append(article.find('a')['href'])
+            all_news['titles'] = titles
+            all_news['urls'] = urls
 
-    self.bot.send_message(user_id, 'Последние новости:',
-                          reply_markup=keyboards.set_news_buttons(all_news))
-    # except:
-    #     self.bot.send_message(user_id, 'Здесь пока нет новостей')
+        self.bot.send_message(user_id, 'Последние новости:',
+                              reply_markup=keyboards.set_news_buttons(user_id, all_news))
+    except:
+        self.bot.send_message(user_id, 'Здесь пока нет новостей')
 
 
 def send_articles(self, user_id):
@@ -254,9 +262,9 @@ def send_articles(self, user_id):
     urls = []
     all_articles = {}
 
-    team_name = users_controller.get_user(user_id).team
+    user = users_controller.get_user(user_id)
 
-    url = get_team_foot_url(team_name)
+    url = get_team_foot_url(user.champ, user.team)
 
     page = requests.get(url)
     html = page.text
@@ -276,7 +284,7 @@ def send_articles(self, user_id):
         all_articles['urls'] = urls
 
         self.bot.send_message(user_id, 'Статьи',
-                              reply_markup=keyboards.set_news_buttons(all_articles))
+                              reply_markup=keyboards.set_news_buttons(user_id, all_articles))
 
     except:
         self.bot.send_message(user_id, 'Здесь пока нет статей')
