@@ -33,7 +33,7 @@ class States(object):
                 self.go_to_state(message, 'next_match_state')
             elif message.text == 'Последний матч':
                 self.bot.send_message(message.chat.id,
-                                      parse.parse_info(users_controller.get_user(message.chat.id).team,
+                                      parse.parse_info(users_controller.get_user(message.chat.id),
                                                        match='last'),
                                       parse_mode='markdown')
             elif message.text == 'Новости':
@@ -54,7 +54,7 @@ class States(object):
     def next_match_state(self, message, first_entry=False):
         if first_entry:
             user_id = message.chat.id
-            self.bot.send_message(user_id, parse.parse_info(users_controller.get_user(user_id).team),
+            self.bot.send_message(user_id, parse.parse_info(users_controller.get_user(user_id)),
                                   reply_markup=keyboards.set_return_keyboard(),
                                   parse_mode='markdown')
         else:
@@ -63,7 +63,7 @@ class States(object):
     def time_state(self, message, first_entry=False):
         if first_entry:
             user_id = message.chat.id
-            self.bot.send_message(user_id, parse.parse_time(users_controller.get_user(user_id).team),
+            self.bot.send_message(user_id, parse.parse_time(users_controller.get_user(user_id)),
                                   reply_markup=keyboards.set_return_keyboard())
         else:
             self.go_to_state(message, 'start')

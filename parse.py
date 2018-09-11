@@ -36,8 +36,8 @@ def get_countries_dict():
 
 
 #parses all information about next match
-def parse_match(team_name, match='next'):
-    url = get_team_foot_url(team_name)
+def parse_match(champ_name, team_name, match='next'):
+    url = get_team_foot_url(champ_name, team_name)
 
     if match == 'next':
         table_num = 1
@@ -76,8 +76,8 @@ def parse_match(team_name, match='next'):
 
 
 #parses general information about next match
-def parse_info(team_name, match='next'):
-    match = parse_match(team_name, match)
+def parse_info(user, match='next'):
+    match = parse_match(user.champ, user.team, match)
 
     if match == 'next':
         match_string = 'Следующий'
@@ -94,8 +94,8 @@ def parse_info(team_name, match='next'):
 
 
 #parse remaining time before next match
-def parse_time(team_name):
-    next_match = parse_match(team_name, match='next')
+def parse_time(user):
+    next_match = parse_match(user.champ, user.team, match='next')
     date, time = next_match['date'], next_match['time']
 
     day = int(date.split('.')[0])
@@ -352,8 +352,8 @@ def get_teams_list(user_id):
 
 
 def get_teams_squad(user_id):
-    team_name = users_controller.get_user(user_id).team
-    url = get_team_foot_url(team_name)
+    user = users_controller.get_user(user_id)
+    url = get_team_foot_url(user.champ, user.team)
     countries_dict = get_countries_dict()
 
     message_text = ''
