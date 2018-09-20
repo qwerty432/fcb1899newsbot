@@ -51,7 +51,7 @@ def set_articles_buttons(user_id):
 def set_settings_keyboard(lang):
     keyboard = types.ReplyKeyboardMarkup(True)
 
-    keyboard.row(LANG_DICT[lang]['chanhe_lang_btn'])
+    keyboard.row(LANG_DICT[lang]['change_lang_btn'])
     keyboard.row(LANG_DICT[lang]['choose_team_btn'])
     keyboard.row(LANG_DICT[lang]['return_btn'])
     return keyboard

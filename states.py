@@ -68,7 +68,10 @@ class States(object):
             self.bot.send_message(message.chat.id, LANG_DICT[lang]['settings_btn'],
                                   reply_markup=keyboards.set_settings_keyboard(lang))
         else:
-            if message.text == LANG_DICT[lang]['choose_team_btn']:
+            if message.text == LANG_DICT[lang]['change_lang_btn']:
+                users_controller.set_lang(message.chat.id, lang)
+                self.go_to_state(message, 'settings_state')
+            elif message.text == LANG_DICT[lang]['choose_team_btn']:
                 self.go_to_state(message, 'choose_champ_state')
             elif message.text == LANG_DICT[lang]['return_btn']:
                 self.go_to_state(message, 'start')

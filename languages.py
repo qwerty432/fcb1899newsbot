@@ -12,7 +12,7 @@ LANG_DICT = {
             'return_btn': 'Назад',
             'choose_champ_msg': 'Выберите чемпионат:',
             'choose_team_msg': 'Выберите команду:',
-            'chanhe_lang_btn': 'Изменить язык 🇷🇺'
+            'change_lang_btn': 'Изменить язык 🇷🇺'
         },
         'ua': {
             'hello_msg': 'Привіт!',
@@ -27,6 +27,6 @@ LANG_DICT = {
             'return_btn': 'Назад',
             'choose_champ_msg': 'Виберіть чемпіонат:',
             'choose_team_msg': 'Виберіть команду:',
-            'chanhe_lang_btn': 'Змінити команду 🇺🇦'
+            'change_lang_btn': 'Змінити мову 🇺🇦'
         }
 }

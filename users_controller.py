@@ -2,6 +2,7 @@ from db import connect
 from sqlalchemy import Table, Column, Integer, String, ARRAY
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import select
+import json
 
 con, meta = connect()
 
@@ -97,5 +98,17 @@ def set_team(user_id, team_name):
 def set_champ(user_id, champ):
     users = meta.tables['users']
     query = users.update().where(users.c.id == user_id).values(champ=champ)
+
+    con.execute(query)
+
+
+def set_lang(user_id, lang):
+    if lang == 'ru':
+        change_lang = 'ua'
+    else:
+        change_lang = 'ru'
+
+    users = meta.tables['users']
+    query = users.update().where(users.c.id == user_id).values(language=change_lang)
 
     con.execute(query)
