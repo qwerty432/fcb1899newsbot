@@ -2,6 +2,7 @@ import users_controller
 import keyboards
 import parse
 from useful_dictionaries import *
+from languages import LANG_DICT
 
 
 class States(object):
@@ -24,68 +25,83 @@ class States(object):
         self.states[state_name](message, first_entry=True)
 
     def start_state(self, message, first_entry=False):
+        user = users_controller.get_user(message.chat.id)
+        lang = user['language']
         if first_entry:
-            self.bot.send_message(message.chat.id, 'Hello there!',
-                                  reply_markup=keyboards.set_main_keyboard())
+            self.bot.send_message(message.chat.id, LANG_DICT[lang]['hello_msg'],
+                                  reply_markup=keyboards.set_main_keyboard(lang))
         else:
-            if message.text == 'Следующий матч':
+            if message.text == LANG_DICT[lang]['next_match_btn']:
                 self.bot.send_message(message.chat.id,
                                       parse.parse_info(users_controller.get_user(message.chat.id)),
                                       parse_mode='markdown')
-            elif message.text == 'Последний матч':
+
+            elif message.text == LANG_DICT[lang]['last_match_btn']:
                 self.bot.send_message(message.chat.id,
                                       parse.parse_info(users_controller.get_user(message.chat.id),
                                                        match_type='last'),
                                       parse_mode='markdown')
-            elif message.text == 'Новости':
+
+            elif message.text == LANG_DICT[lang]['news_btn']:
                 parse.send_news(self, message.chat.id)
-            elif message.text == 'Статьи':
+
+            elif message.text == LANG_DICT[lang]['articles_btn']:
                 parse.send_articles(self, message.chat.id)
-            elif message.text == 'Состав':
+
+            elif message.text == LANG_DICT[lang]['squad_btn']:
                 self.bot.send_message(message.chat.id, parse.get_teams_squad(message.chat.id),
                                       parse_mode='markdown')
-            elif message.text == 'Время':
+
+            elif message.text == LANG_DICT[lang]['time_btn']:
                 self.bot.send_message(message.chat.id, parse.parse_time(users_controller.get_user(message.chat.id)))
-            elif message.text == 'Настройки':
+
+            elif message.text == LANG_DICT[lang]['settings_btn']:
                 self.go_to_state(message, 'settings_state')
             else:
-                self.bot.send_message(message.chat.id, 'Hello there!',
+                self.bot.send_message(message.chat.id, LANG_DICT[lang]['hello_msg'],
                                       reply_markup=keyboards.set_main_keyboard())
 
     def settings_state(self, message, first_entry=False):
+        user = users_controller.get_user(message.chat.id)
+        lang = user['language']
         if first_entry:
-            self.bot.send_message(message.chat.id, 'Меню настроек',
-                                  reply_markup=keyboards.set_settings_keyboard())
+            self.bot.send_message(message.chat.id, LANG_DICT[lang]['settings_btn'],
+                                  reply_markup=keyboards.set_settings_keyboard(lang))
         else:
-            if message.text == 'Выбрать команду':
+            if message.text == LANG_DICT[lang]['choose_team_btn']:
                 self.go_to_state(message, 'choose_champ_state')
-            elif message.text == 'Назад':
+            elif message.text == LANG_DICT[lang]['return_btn']:
                 self.go_to_state(message, 'start')
             else:
                 self.go_to_state(message, 'settings_state')
 
     def choose_champ_state(self, message, first_entry=False):
+        user = users_controller.get_user(message.chat.id)
+        lang = user['language']
         if first_entry:
-            self.bot.send_message(message.chat.id, 'Выберите чемпионат:',
-                                  reply_markup=keyboards.set_champs_keyboard())
+            self.bot.send_message(message.chat.id, LANG_DICT[lang]['choose_champ_msg'],
+                                  reply_markup=keyboards.set_champs_keyboard(lang))
         else:
             if message.text in CHAMPIONATS_DICT.keys():
                 users_controller.set_champ(message.chat.id, message.text)
                 self.go_to_state(message, 'choose_team_state')
-            elif message.text == 'Назад':
+
+            elif message.text == LANG_DICT[lang]['return_btn']:
                 self.go_to_state(message, 'settings_state')
             else:
                 self.go_to_state(message, 'choose_champ_state')
 
     def choose_team_state(self, message, first_entry=False):
+        user = users_controller.get_user(message.chat.id)
+        lang = user['language']
         if first_entry:
-            self.bot.send_message(message.chat.id, 'Выберите команду:',
-                                  reply_markup=keyboards.set_teams_keyboard(message.chat.id))
+            self.bot.send_message(message.chat.id, LANG_DICT[lang]['choose_team_msg'],
+                                  reply_markup=keyboards.set_teams_keyboard(lang, message.chat.id))
         else:
             if message.text in parse.get_teams_list(message.chat.id):
                 users_controller.set_team(message.chat.id, message.text)
                 self.go_to_state(message, 'start')
-            elif message.text == 'Назад':
-                self.go_to_state(message, 'settings_state')
+            elif message.text == LANG_DICT[lang]['return_btn']:
+                self.go_to_state(message, 'choose_champ_state')
             else:
                 self.go_to_state(message, 'choose_team_state')

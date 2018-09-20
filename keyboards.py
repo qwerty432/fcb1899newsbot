@@ -2,20 +2,21 @@ from telebot import types
 import parse
 import users_controller
 from useful_dictionaries import *
+from languages import LANG_DICT
 
 
-def set_main_keyboard():
+def set_main_keyboard(lang):
     keyboard = types.ReplyKeyboardMarkup(True)
-    keyboard.row('Последний матч', 'Следующий матч')
-    keyboard.row('Время', 'Состав')
-    keyboard.row('Новости', 'Статьи')
-    keyboard.row('Настройки')
+    keyboard.row(LANG_DICT[lang]['last_match_btn'], LANG_DICT[lang]['next_match_btn'])
+    keyboard.row(LANG_DICT[lang]['time_btn'], LANG_DICT[lang]['squad_btn'])
+    keyboard.row(LANG_DICT[lang]['news_btn'], LANG_DICT[lang]['articles_btn'])
+    keyboard.row(LANG_DICT[lang]['settings_btn'])
     return keyboard
 
 
-def set_return_keyboard():
+def set_return_keyboard(lang):
     keyboard = types.ReplyKeyboardMarkup(True)
-    keyboard.row('Назад')
+    keyboard.row(LANG_DICT[lang]['return_btn'])
     return keyboard
 
 
@@ -47,31 +48,31 @@ def set_articles_buttons(user_id):
     return keyboard
 
 
-def set_settings_keyboard():
+def set_settings_keyboard(lang):
     keyboard = types.ReplyKeyboardMarkup(True)
 
-    keyboard.row('Выбрать команду')
-    keyboard.row('Назад')
+    keyboard.row(LANG_DICT[lang]['choose_team_btn'])
+    keyboard.row(LANG_DICT[lang]['return_btn'])
     return keyboard
 
 
-def set_champs_keyboard():
+def set_champs_keyboard(lang):
     keyboard = types.ReplyKeyboardMarkup(True)
 
     for i, team in enumerate(sorted(CHAMPIONATS_DICT.keys())):
         keyboard.row(team)
-    keyboard.row('Назад')
+    keyboard.row(LANG_DICT[lang]['return_btn'])
 
     return keyboard
 
 
-def set_teams_keyboard(user_id):
+def set_teams_keyboard(lang, user_id):
     keyboard = types.ReplyKeyboardMarkup(True)
 
     teams = parse.get_teams_list(user_id)
 
     for i, team in enumerate(teams):
         keyboard.row(team)
-    keyboard.row('Назад')
+    keyboard.row(LANG_DICT[lang]['return_btn'])
 
     return keyboard
