@@ -10,6 +10,7 @@ def create_user_table():
         users = Table('users', meta,
             Column('id', Integer, primary_key=True),
             Column('username', String),
+            Column('language', String(2)),
             Column('state', String(50)),
             Column('champ', String(20)),
             Column('team', String(20)),
@@ -40,7 +41,8 @@ def create_user(message):
     users = meta.tables['users']
     query = users.insert().values(id=message.chat.id,
                                    username=message.from_user.username,
-                                   state='start')
+                                   state='start',
+                                   language='ru')
     try:
         con.execute(query)
     except IntegrityError:
