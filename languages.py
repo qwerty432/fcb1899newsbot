@@ -12,5 +12,19 @@ LANG_DICT = {
             'return_btn': 'Назад',
             'choose_champ_msg': 'Выберите чемпионат:',
             'choose_team_msg': 'Выберите команду:'
+        },
+        'ua': {
+            'hello_msg': 'Привіт!',
+            'last_match_btn': 'Останній матч',
+            'next_match_btn':'Наступний матч',
+            'news_btn': 'Новини',
+            'articles_btn': 'Статті',
+            'squad_btn': 'Склад',
+            'time_btn': 'Час',
+            'settings_btn': 'Налаштування',
+            'choose_team_btn': 'Вибрати команду',
+            'return_btn': 'Назад',
+            'choose_champ_msg': 'Виберіть чемпіонат:',
+            'choose_team_msg': 'Виберіть команду:'
         }
 }
