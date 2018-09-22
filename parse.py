@@ -10,7 +10,9 @@ import users_controller
 import flag
 import keyboards
 from useful_dictionaries import *
+from googletrans import Translator
 
+translator = Translator()
 
 def get_team_foot_url(champ_name, team_name):
     # with open('footlinks.json', 'r') as file:
@@ -62,6 +64,9 @@ def parse_match(champ_name, team_name, match='next'):
 
     match_where = [' '.join(part.split()) for part in matches[match_index].find('p').get_text().split('\n')[1:-1]]
 
+    # print(match_where)
+
+
     match['date'] = match_where[0]
     match['tournament'] = match_where[1]
     match['stage'] = match_where[2]
@@ -72,11 +77,15 @@ def parse_match(champ_name, team_name, match='next'):
     match['guest'] = ' '.join(matches[match_index + 1].find_all('td')[3].get_text().split())
     match['score'] = ' '.join(matches[match_index + 1].find_all('td')[2].get_text().split())
 
+    for key in match:
+        if key in ['tournament', 'stage', 'home', 'guest']:
+            match[key] = translator.translate(match[key], 'uk').text
+
     return match
 
 
 #parses general information about next match
-def parse_info(user, match_type='next'):
+def parse_info(user, lang, match_type='next'):
     match = parse_match(user.champ, user.team, match_type)
 
     if match_type == 'next':
@@ -85,11 +94,13 @@ def parse_info(user, match_type='next'):
         match_string = 'Последний'
 
     if match is not None:
-        return "📌 *{} матч*\n⚽ {} {} {}\n🏆 {}, {}\n📅 {}, {}"\
+        message_text = "📌 *{} матч*\n⚽ {} {} {}\n🏆 {}, {}\n📅 {}, {}"\
                                     .format(match_string, match['home'], match['score'], match['guest'], match['tournament'], \
                                     match['stage'], match['date'], match['time'])
     else:
-        return "Дата следующего матча неизвестна"
+        message_text = "Дата следующего матча неизвестна"
+
+    return message_text
 
 
 
