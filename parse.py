@@ -65,9 +65,6 @@ def parse_match(champ_name, team_name, lang=None, match='next'):
 
     match_where = [' '.join(part.split()) for part in matches[match_index].find('p').get_text().split('\n')[1:-1]]
 
-    # print(match_where)
-
-
     match['date'] = match_where[0]
     match['tournament'] = match_where[1]
     match['stage'] = match_where[2]
@@ -125,37 +122,35 @@ def parse_time(user):
     hours = time_left.seconds // 3600
     minutes = (time_left.seconds % 3600) // 60
 
-    endings = get_endings(time_left.days, hours, minutes)
+    endings = get_endings(user.language, time_left.days, hours, minutes)
 
-    message_text = 'До следующего матча {} {} {}, {} {}, {} {}'.format(endings[0],
-                                                         time_left.days, endings[1],
-                                                         hours, endings[2],
-                                                         minutes, endings[3])
+    message_text = '{} {} {} {}, {} {}, {} {}'.format(LANG_DICT[user.language]['time_to_match_msg'],
+                                                      endings[0],
+                                                      time_left.days, endings[1],
+                                                      hours, endings[2],
+                                                      minutes, endings[3])
 
     return message_text
 
 
-def get_endings(*values):
+def get_endings(lang, *values):
     endings = []
-    left_message = ['остался', 'осталось']
-    values_end_with_1 = ['день', 'час', 'минута']
-    values_end_with_234 = ['дня', 'часа', 'минуты']
-    other_values = ['дней', 'часов', 'минут']
+    ENDINGS_DICT = LANG_DICT[lang]['endings']
 
     for i, value in enumerate(values):
         remainder = value % 10
         if remainder == 1:
             if i == 0:
-                endings.append(left_message[0])
-            endings.append(values_end_with_1[i])
+                endings.append(ENDINGS_DICT['left_message'][0])
+            endings.append(ENDINGS_DICT['values_end_with_1'][i])
         elif remainder in range(2, 5):
             if i == 0:
-                endings.append(left_message[1])
-            endings.append(values_end_with_234[i])
+                endings.append(ENDINGS_DICT['left_message'][1])
+            endings.append(ENDINGS_DICT['values_end_with_234'][i])
         else:
             if i == 0:
-                endings.append(left_message[1])
-            endings.append(other_values[i])
+                endings.append(ENDINGS_DICT['left_message'][1])
+            endings.append(ENDINGS_DICT['other_values'][i])
 
     return endings
 

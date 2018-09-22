@@ -16,6 +16,13 @@ LANG_DICT = {
             'next_match_msg': 'Следующий',
             'last_match_msg': 'Последний',
             'uknown_match_date_msg': 'Дата следующего матча неизвестна',
+            'time_to_match_msg': 'До следующего матча',
+            'endings':{
+                        'left_message': ['остался', 'осталось'],
+                        'values_end_with_1': ['день', 'час', 'минута'],
+                        'values_end_with_234': ['дня', 'часа', 'минуты'],
+                        'other_values': ['дней', 'часов', 'минут']
+                      }
         },
         'ua': {
             'hello_msg': 'Привіт!',
@@ -34,5 +41,12 @@ LANG_DICT = {
             'next_match_msg': 'Наступний',
             'last_match_msg': 'Останній',
             'uknown_match_date_msg': 'Дата наступного матчу невідома',
+            'time_to_match_msg': 'До наступного матчу',
+            'endings':{
+                        'left_message': ['залишився', 'залишилось'],
+                        'values_end_with_1': ['день', 'година', 'хвилина'],
+                        'values_end_with_234': ['дні', 'години', 'хвилини'],
+                        'other_values': ['днів', 'годин', 'хвилин']
+                      }
         }
 }
