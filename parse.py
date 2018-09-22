@@ -381,7 +381,10 @@ def get_teams_squad(user_id):
         footballer_names_str = '\n'.join([footballer.find('td', class_='num').get_text() \
                             + '. ' \
                             + footballer.find('a').get_text() for footballer in footballers])
-        translated_names = translator.translate(footballer_names_str, src='ru', dest='uk').text.split('\n')
+        if user.language == 'ua':
+            translated_names = translator.translate(footballer_names_str, src='ru', dest='uk').text.split('\n')
+        else:
+            translated_names = footballer_names_str.split('\n')
 
         for trans_footballer in translated_names:
             num = trans_footballer.split('.')[0]
@@ -390,7 +393,7 @@ def get_teams_squad(user_id):
             try:
                 birth_date = footballer.find('td', class_='birth').find('p').get_text()
             except:
-                birth_date = 'не указано'
+                birth_date = LANG_DICT[user.language]['not_mentioned_str']
             country_name = footballer.find('img')['alt']
 
             for key in countries_dict:
