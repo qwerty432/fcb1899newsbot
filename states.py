@@ -33,12 +33,12 @@ class States(object):
         else:
             if message.text == LANG_DICT[lang]['next_match_btn']:
                 self.bot.send_message(message.chat.id,
-                                      parse.parse_info(users_controller.get_user(message.chat.id)),
+                                      parse.parse_info(users_controller.get_user(message.chat.id), lang),
                                       parse_mode='markdown')
 
             elif message.text == LANG_DICT[lang]['last_match_btn']:
                 self.bot.send_message(message.chat.id,
-                                      parse.parse_info(users_controller.get_user(message.chat.id),
+                                      parse.parse_info(users_controller.get_user(message.chat.id), lang,
                                                        match_type='last'),
                                       parse_mode='markdown')
 

@@ -38,7 +38,7 @@ def get_countries_dict():
 
 
 #parses all information about next match
-def parse_match(champ_name, team_name, match='next'):
+def parse_match(champ_name, team_name, lang=None, match='next'):
     url = get_team_foot_url(champ_name, team_name)
 
     if match == 'next':
@@ -78,7 +78,7 @@ def parse_match(champ_name, team_name, match='next'):
     match['score'] = ' '.join(matches[match_index + 1].find_all('td')[2].get_text().split())
 
     for key in match:
-        if key in ['tournament', 'stage', 'home', 'guest']:
+        if key in ['tournament', 'stage', 'home', 'guest'] and lang == 'ua':
             match[key] = translator.translate(match[key], 'uk').text
 
     return match
@@ -86,7 +86,7 @@ def parse_match(champ_name, team_name, match='next'):
 
 #parses general information about next match
 def parse_info(user, lang, match_type='next'):
-    match = parse_match(user.champ, user.team, match_type)
+    match = parse_match(user.champ, user.team, lang, match_type)
 
     if match_type == 'next':
         match_string = 'Следующий'
