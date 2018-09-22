@@ -101,7 +101,6 @@ def parse_info(user, lang, match_type='next'):
     return message_text
 
 
-
 #parse remaining time before next match
 def parse_time(user):
     next_match = parse_match(user.champ, user.team, match='next')
@@ -373,21 +372,25 @@ def get_teams_squad(user_id):
 
     squad_block = soup.find('article', class_='team-consist')
 
-
     for i, position_table in enumerate(squad_block.find_all('table', class_='consist-table')):
         message_text += squad_positions[i]
 
         footballers = position_table.find_all('tr')
         country_emoji = ''
 
-        for footballer in footballers:
-            num = footballer.find('td', class_='num').get_text()
-            name = footballer.find('a').get_text()
+        footballer_names_str = '\n'.join([footballer.find('td', class_='num').get_text() \
+                            + '. ' \
+                            + footballer.find('a').get_text() for footballer in footballers])
+        translated_names = translator.translate(footballer_names_str, src='ru', dest='uk').text.split('\n')
+
+        for trans_footballer in translated_names:
+            num = trans_footballer.split('.')[0]
+            name = trans_footballer.split('.')[1].strip()
+            footballer = [footballer for footballer in footballers if footballer.find('td', class_='num').get_text() == num][0]
             try:
                 birth_date = footballer.find('td', class_='birth').find('p').get_text()
             except:
                 birth_date = 'не указано'
-                print('Birth date uknown')
             country_name = footballer.find('img')['alt']
 
             for key in countries_dict:
