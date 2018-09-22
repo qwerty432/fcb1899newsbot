@@ -363,7 +363,7 @@ def get_teams_squad(user_id):
     countries_dict = get_countries_dict()
 
     message_text = ''
-    squad_positions = ['*Вратари:\n*', '*Защитники:\n*', '*Полузащитники:\n*', '*Нападающие:\n*']
+    squad_positions = LANG_DICT[user.language]['positions']
 
     page = requests.get(url)
     html = page.text
