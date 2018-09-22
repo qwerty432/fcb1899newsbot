@@ -361,9 +361,10 @@ def get_teams_squad(user_id):
     user = users_controller.get_user(user_id)
     url = get_team_foot_url(user.champ, user.team)
     countries_dict = get_countries_dict()
+    lang = user.language
 
     message_text = ''
-    squad_positions = LANG_DICT[user.language]['positions']
+    squad_positions = LANG_DICT[lang]['positions']
 
     page = requests.get(url)
     html = page.text
@@ -371,6 +372,9 @@ def get_teams_squad(user_id):
     soup = BeautifulSoup(html, 'lxml')
 
     squad_block = soup.find('article', class_='team-consist')
+
+    if not squad_block:
+        return LANG_DICT[lang]['no_squad_msg']
 
     for i, position_table in enumerate(squad_block.find_all('table', class_='consist-table')):
         message_text += squad_positions[i]
@@ -381,7 +385,7 @@ def get_teams_squad(user_id):
         footballer_names_str = '\n'.join([footballer.find('td', class_='num').get_text() \
                             + '. ' \
                             + footballer.find('a').get_text() for footballer in footballers])
-        if user.language == 'ua':
+        if lang == 'ua':
             translated_names = translator.translate(footballer_names_str, src='ru', dest='uk').text.split('\n')
         else:
             translated_names = footballer_names_str.split('\n')
@@ -393,7 +397,7 @@ def get_teams_squad(user_id):
             try:
                 birth_date = footballer.find('td', class_='birth').find('p').get_text()
             except:
-                birth_date = LANG_DICT[user.language]['not_mentioned_str']
+                birth_date = LANG_DICT[lang]['not_mentioned_str']
             country_name = footballer.find('img')['alt']
 
             for key in countries_dict:
