@@ -15,16 +15,23 @@ from languages import LANG_DICT
 
 translator = Translator()
 
-def get_team_foot_url(champ_name, team_name):
+def get_team_foot_url(user):
     # with open('footlinks.json', 'r') as file:
     #     data = json.load(file)
     #     url = data[team_name]['foot_link']
 
-    url = CHAMPIONATS_DICT[champ_name]
+    url = CHAMPIONATS_DICT[user.language][user.champ]
     page = requests.get(url)
     html = page.text
 
     soup = BeautifulSoup(html, 'lxml')
+
+    if user.language == 'ru':
+        team_name = user.team
+    else:
+        with open('{}_teams.json'.format(user.id)) as file:
+            data = json.load(file)
+        team_name = data[user.team]
 
     team_url = [team['href'] for team in soup.find('section', class_='top-teams').find_all('a') if team.find('img')['alt'] == team_name][0]
 
@@ -39,8 +46,9 @@ def get_countries_dict():
 
 
 #parses all information about next match
-def parse_match(champ_name, team_name, lang=None, match='next'):
-    url = get_team_foot_url(champ_name, team_name)
+def parse_match(champ_name, team_name, user_id, lang=None, match='next'):
+    user = users_controller.get_user(user_id)
+    url = get_team_foot_url(user)
 
     if match == 'next':
         table_num = 1
@@ -84,7 +92,7 @@ def parse_match(champ_name, team_name, lang=None, match='next'):
 
 #parses general information about next match
 def parse_info(user, lang, match_type='next'):
-    match = parse_match(user.champ, user.team, lang, match_type)
+    match = parse_match(user.champ, user.team, user.id, lang, match_type)
 
     if match_type == 'next':
         match_string = LANG_DICT[lang]['next_match_msg']
@@ -103,7 +111,7 @@ def parse_info(user, lang, match_type='next'):
 
 #parse remaining time before next match
 def parse_time(user):
-    next_match = parse_match(user.champ, user.team, match='next')
+    next_match = parse_match(user.champ, user.team, user.id, match='next')
 
     if not next_match:
         return LANG_DICT[user.language]['uknown_match_date_msg']
@@ -243,7 +251,7 @@ def send_news(self, user_id):
 
     user = users_controller.get_user(user_id)
 
-    url = get_team_foot_url(user.champ, user.team)
+    url = get_team_foot_url(user)
 
     page = requests.get(url)
     html = page.text
@@ -274,7 +282,7 @@ def send_articles(self, user_id):
 
     user = users_controller.get_user(user_id)
 
-    url = get_team_foot_url(user.champ, user.team)
+    url = get_team_foot_url(user)
 
     page = requests.get(url)
     html = page.text
@@ -358,12 +366,19 @@ def get_teams_list(user_id):
 
     teams = [team['alt'] for team in soup.find('section', class_='top-teams').find_all('img')]
 
-    return teams
+    if user.language == 'ru':
+        return teams
+    else:
+        translated_teams = [team for team in translator.translate('\n'.join(teams), src='ru', dest='uk').text.split('\n')]
+        data = dict(zip(translated_teams, teams))
+        with open('{}_teams.json'.format(user_id), 'w') as file:
+            json.dump(data, file)
 
+        return translated_teams
 
 def get_teams_squad(user_id):
     user = users_controller.get_user(user_id)
-    url = get_team_foot_url(user.champ, user.team)
+    url = get_team_foot_url(user)
     countries_dict = get_countries_dict()
     lang = user.language
 

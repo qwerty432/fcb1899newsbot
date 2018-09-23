@@ -64,7 +64,7 @@ class States(object):
                 self.go_to_state(message, 'settings_state')
             else:
                 self.bot.send_message(message.chat.id, LANG_DICT[lang]['hello_msg'],
-                                      reply_markup=keyboards.set_main_keyboard())
+                                      reply_markup=keyboards.set_main_keyboard(lang))
 
     def settings_state(self, message, first_entry=False):
         user = users_controller.get_user(message.chat.id)
