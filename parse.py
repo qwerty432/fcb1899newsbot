@@ -104,6 +104,10 @@ def parse_info(user, lang, match_type='next'):
 #parse remaining time before next match
 def parse_time(user):
     next_match = parse_match(user.champ, user.team, match='next')
+
+    if not next_match:
+        return LANG_DICT[user.language]['uknown_match_date_msg']
+
     date, time = next_match['date'], next_match['time']
 
     day = int(date.split('.')[0])
