@@ -30,6 +30,11 @@ class States(object):
         if first_entry:
             self.bot.send_message(message.chat.id, LANG_DICT[lang]['hello_msg'],
                                   reply_markup=keyboards.set_main_keyboard(lang))
+            if not user.team:
+                self.bot.send_message(message.chat.id, LANG_DICT[user.language]['first_choose_team_msg'])
+                self.go_to_state(message, 'choose_champ_state')
+            else:
+                pass
         else:
             if message.text == LANG_DICT[lang]['next_match_btn']:
                 self.bot.send_message(message.chat.id,
