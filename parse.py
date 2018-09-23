@@ -348,8 +348,8 @@ def get_teams_list(user_id):
     # except FileNotFoundError:
     #     teams_list = parse_teams()
 
-    champ_name = users_controller.get_user(user_id).champ
-    url = CHAMPIONATS_DICT[champ_name]
+    user = users_controller.get_user(user_id)
+    url = CHAMPIONATS_DICT[user.language][user.champ]
 
     page = requests.get(url)
     html = page.text

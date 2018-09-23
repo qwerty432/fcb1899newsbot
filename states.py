@@ -92,7 +92,7 @@ class States(object):
             self.bot.send_message(message.chat.id, LANG_DICT[lang]['choose_champ_msg'],
                                   reply_markup=keyboards.set_champs_keyboard(lang))
         else:
-            if message.text in CHAMPIONATS_DICT.keys():
+            if message.text in CHAMPIONATS_DICT[lang].keys():
                 users_controller.set_champ(message.chat.id, message.text)
                 self.go_to_state(message, 'choose_team_state')
 

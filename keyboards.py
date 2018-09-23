@@ -60,7 +60,7 @@ def set_settings_keyboard(lang):
 def set_champs_keyboard(lang):
     keyboard = types.ReplyKeyboardMarkup(True)
 
-    for i, team in enumerate(sorted(CHAMPIONATS_DICT.keys())):
+    for i, team in enumerate(sorted(CHAMPIONATS_DICT[lang].keys())):
         keyboard.row(team)
     keyboard.row(LANG_DICT[lang]['return_btn'])
 
