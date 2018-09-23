@@ -76,6 +76,7 @@ class States(object):
             if message.text == LANG_DICT[lang]['change_lang_btn']:
                 users_controller.set_lang(message.chat.id, lang)
                 updated_lang = users_controller.get_user(message.chat.id).language
+                parse.update_names(user, updated_lang)
                 self.bot.send_message(message.chat.id, LANG_DICT[updated_lang]['changed_lang_msg'])
                 self.go_to_state(message, 'settings_state')
             elif message.text == LANG_DICT[lang]['choose_team_btn']:

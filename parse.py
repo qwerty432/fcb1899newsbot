@@ -29,9 +29,7 @@ def get_team_foot_url(user):
     if user.language == 'ru':
         team_name = user.team
     else:
-        with open('{}_teams.json'.format(user.id)) as file:
-            data = json.load(file)
-        team_name = data[user.team]
+        team_name = get_users_teams(user.id)[user.team]
 
     team_url = [team['href'] for team in soup.find('section', class_='top-teams').find_all('a') if team.find('img')['alt'] == team_name][0]
 
@@ -40,6 +38,13 @@ def get_team_foot_url(user):
 
 def get_countries_dict():
     with open('country.json', 'r') as file:
+        data = json.load(file)
+
+    return data
+
+
+def get_users_teams(user_id):
+    with open('{}_teams.json'.format(user_id)) as file:
         data = json.load(file)
 
     return data
@@ -366,14 +371,14 @@ def get_teams_list(user_id):
 
     teams = [team['alt'] for team in soup.find('section', class_='top-teams').find_all('img')]
 
+    translated_teams = [team for team in translator.translate('\n'.join(teams), src='ru', dest='uk').text.split('\n')]
+    data = dict(zip(translated_teams, teams))
+    with open('{}_teams.json'.format(user_id), 'w') as file:
+        json.dump(data, file)
+
     if user.language == 'ru':
         return teams
     else:
-        translated_teams = [team for team in translator.translate('\n'.join(teams), src='ru', dest='uk').text.split('\n')]
-        data = dict(zip(translated_teams, teams))
-        with open('{}_teams.json'.format(user_id), 'w') as file:
-            json.dump(data, file)
-
         return translated_teams
 
 def get_teams_squad(user_id):
@@ -428,3 +433,15 @@ def get_teams_squad(user_id):
         message_text += '\n'
 
     return message_text
+
+
+def update_names(user, updated_lang):
+    data = get_users_teams(user.id)
+    print(data)
+
+    if updated_lang == 'ua':
+        users_controller.set_champ(user.id, [champ for champ in CHAMPIONATS_DICT['ua'].keys() if CHAMPIONATS_DICT['ru'][user.champ] == CHAMPIONATS_DICT['ua'][champ]][0])
+        users_controller.set_team(user.id, [team for team in data.keys() if user.team == data[team]][0])
+    else:
+        users_controller.set_champ(user.id, [champ for champ in CHAMPIONATS_DICT['ru'].keys() if CHAMPIONATS_DICT['ua'][user.champ] == CHAMPIONATS_DICT['ru'][champ]][0])
+        users_controller.set_team(user.id, data[user.team])
