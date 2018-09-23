@@ -320,34 +320,6 @@ def get_football_link(name):
     return link
 
 
-def parse_teams_for_world_cup():
-    teams_dict = {}
-    url = 'https://2018.football.ua'
-    page = requests.get(url + '/teams')
-    html = page.text
-
-    soup = BeautifulSoup(html, 'lxml')
-
-    teams = soup.find('ul', class_="news-list three-columns-list teams-list-page clearfix").find_all('li')
-
-    for team in teams:
-        team_name = team.find('h2', class_='news-title').text
-        foot_link = get_football_link(team_name)
-        champ_link = url + team.find('a', class_='news-link')['href']
-
-        link_dict = {
-                    'foot_link': foot_link,
-                    'champ_link': champ_link
-                   }
-
-        teams_dict[team_name] = link_dict
-
-    with open('footlinks.json', 'w') as file:
-        json.dump(teams_dict, file, indent=4, ensure_ascii=False)
-
-    return sorted([team for team in teams_dict])
-
-
 def get_teams_list(user_id):
     user = users_controller.get_user(user_id)
     url = CHAMPIONATS_DICT[user.language][user.champ]
@@ -368,6 +340,7 @@ def get_teams_list(user_id):
         return teams
     else:
         return translated_teams
+
 
 def get_teams_squad(user_id):
     user = users_controller.get_user(user_id)
