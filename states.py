@@ -31,7 +31,7 @@ class States(object):
             self.bot.send_message(message.chat.id, LANG_DICT[lang]['hello_msg'],
                                   reply_markup=keyboards.set_main_keyboard(lang))
             if not user.team:
-                self.bot.send_message(message.chat.id, LANG_DICT[user.language]['first_choose_team_msg'])
+                self.bot.send_message(message.chat.id, LANG_DICT[lang]['first_choose_team_msg'])
                 self.go_to_state(message, 'choose_champ_state')
             else:
                 pass
@@ -75,6 +75,8 @@ class States(object):
         else:
             if message.text == LANG_DICT[lang]['change_lang_btn']:
                 users_controller.set_lang(message.chat.id, lang)
+                updated_lang = users_controller.get_user(message.chat.id).language
+                self.bot.send_message(message.chat.id, LANG_DICT[updated_lang]['changed_lang_msg'])
                 self.go_to_state(message, 'settings_state')
             elif message.text == LANG_DICT[lang]['choose_team_btn']:
                 self.go_to_state(message, 'choose_champ_state')
