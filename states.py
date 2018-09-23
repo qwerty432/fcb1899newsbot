@@ -48,10 +48,10 @@ class States(object):
                                       parse_mode='markdown')
 
             elif message.text == LANG_DICT[lang]['news_btn']:
-                parse.send_news(self, message.chat.id)
+                parse.send_news(self, message.chat.id, user.language)
 
             elif message.text == LANG_DICT[lang]['articles_btn']:
-                parse.send_articles(self, message.chat.id)
+                parse.send_articles(self, message.chat.id, user.language)
 
             elif message.text == LANG_DICT[lang]['squad_btn']:
                 self.bot.send_message(message.chat.id, parse.get_teams_squad(message.chat.id),

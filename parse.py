@@ -16,10 +16,6 @@ from languages import LANG_DICT
 translator = Translator()
 
 def get_team_foot_url(user):
-    # with open('footlinks.json', 'r') as file:
-    #     data = json.load(file)
-    #     url = data[team_name]['foot_link']
-
     url = CHAMPIONATS_DICT[user.language][user.champ]
     page = requests.get(url)
     html = page.text
@@ -249,7 +245,7 @@ def create_instant_view(url):
         return [response1['url'], response2['url']]
 
 
-def send_news(self, user_id):
+def send_news(self, user_id, lang):
     titles = []
     urls = []
     all_news = {}
@@ -274,13 +270,13 @@ def send_news(self, user_id):
             all_news['titles'] = titles
             all_news['urls'] = urls
 
-        self.bot.send_message(user_id, 'Последние новости:',
+        self.bot.send_message(user_id, LANG_DICT[lang]['last_news_msg'],
                               reply_markup=keyboards.set_news_buttons(user_id, all_news))
     except:
-        self.bot.send_message(user_id, 'Здесь пока нет новостей')
+        self.bot.send_message(user_id, LANG_DICT[lang]['no_news_msg'])
 
 
-def send_articles(self, user_id):
+def send_articles(self, user_id, lang):
     titles = []
     urls = []
     all_articles = {}
@@ -306,11 +302,11 @@ def send_articles(self, user_id):
         all_articles['titles'] = titles
         all_articles['urls'] = urls
 
-        self.bot.send_message(user_id, 'Статьи',
+        self.bot.send_message(user_id, LANG_DICT[lang]['articles_msg'],
                               reply_markup=keyboards.set_news_buttons(user_id, all_articles))
 
     except:
-        self.bot.send_message(user_id, 'Здесь пока нет статей')
+        self.bot.send_message(user_id, LANG_DICT[lang]['no_articles_msg'])
 
 
 def get_football_link(name):
@@ -353,14 +349,6 @@ def parse_teams_for_world_cup():
 
 
 def get_teams_list(user_id):
-    # teams_list = []
-    # try:
-    #     with open('footlinks.json', 'r') as file:
-    #         data = json.load(file)
-    #         teams_list = sorted([team for team in data])
-    # except FileNotFoundError:
-    #     teams_list = parse_teams()
-
     user = users_controller.get_user(user_id)
     url = CHAMPIONATS_DICT[user.language][user.champ]
 
@@ -437,7 +425,6 @@ def get_teams_squad(user_id):
 
 def update_names(user, updated_lang):
     data = get_users_teams(user.id)
-    print(data)
 
     if updated_lang == 'ua':
         users_controller.set_champ(user.id, [champ for champ in CHAMPIONATS_DICT['ua'].keys() if CHAMPIONATS_DICT['ru'][user.champ] == CHAMPIONATS_DICT['ua'][champ]][0])
