@@ -17,3 +17,8 @@ CHAMPIONATS_DICT = {'ru':
                             'Нідерланди': 'https://football.ua/netherlands.html'
                         }
                     }
+
+BOOL_DICT = {
+                True: '✅',
+                False: '❌'
+              }

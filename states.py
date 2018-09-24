@@ -128,7 +128,7 @@ class States(object):
         lang = user['language']
         if first_entry:
             self.bot.send_message(message.chat.id, LANG_DICT[lang]['choose_notifications_msg'],
-                                  reply_markup=keyboards.set_notifications_keyboard(lang, message.chat.id))
+                                  reply_markup=keyboards.set_notifications_keyboard(user))
         else:
             if message.text == LANG_DICT[lang]['return_btn']:
                 self.go_to_state(message, 'settings_state')
