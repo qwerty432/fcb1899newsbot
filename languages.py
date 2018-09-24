@@ -34,6 +34,7 @@ LANG_DICT = {
             'no_articles_msg': 'Пока нет статей',
             'uknown_match_time_msg': 'Время следующего матча неизвестно',
             'notifications_btn': 'Оповещения',
+            'choose_notifications_msg': 'Выберите тип уведомления',
         },
         'ua': {
             'hello_msg': 'Привіт!',
@@ -69,6 +70,7 @@ LANG_DICT = {
             'articles_msg': 'Статті',
             'no_articles_msg': 'Поки немає статей',
             'uknown_match_time_msg': 'Час наступного матчу невідомий',
-            'notifications_btn': 'Сповіщення'
+            'notifications_btn': 'Сповіщення',
+            'choose_notifications_msg': 'Виберіть тип сповіщення'
         }
 }

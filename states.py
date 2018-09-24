@@ -12,7 +12,8 @@ class States(object):
         self.states = {'start': self.start_state,
                        'settings_state': self.settings_state,
                        'choose_team_state': self.choose_team_state,
-                       'choose_champ_state': self.choose_champ_state
+                       'choose_champ_state': self.choose_champ_state,
+                       'notifications_state': self.notifications_state
                        }
 
     def handle_states(self, message, first_entry=False):
@@ -84,6 +85,8 @@ class States(object):
                 self.go_to_state(message, 'settings_state')
             elif message.text == LANG_DICT[lang]['choose_team_btn']:
                 self.go_to_state(message, 'choose_champ_state')
+            elif message.text == LANG_DICT[lang]['notifications_btn']:
+                self.go_to_state(message, 'notifications_state')
             elif message.text == LANG_DICT[lang]['return_btn']:
                 self.go_to_state(message, 'start')
             else:
@@ -119,3 +122,13 @@ class States(object):
                 self.go_to_state(message, 'choose_champ_state')
             else:
                 self.go_to_state(message, 'choose_team_state')
+
+    def notifications_state(self, message, first_entry=False):
+        user = users_controller.get_user(message.chat.id)
+        lang = user['language']
+        if first_entry:
+            self.bot.send_message(message.chat.id, LANG_DICT[lang]['choose_notifications_msg'],
+                                  reply_markup=keyboards.set_notifications_keyboard(lang, message.chat.id))
+        else:
+            if message.text == LANG_DICT[lang]['return_btn']:
+                self.go_to_state(message, 'settings_state')

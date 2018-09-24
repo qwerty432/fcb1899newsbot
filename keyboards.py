@@ -78,3 +78,11 @@ def set_teams_keyboard(lang, user_id):
     keyboard.row(LANG_DICT[lang]['return_btn'])
 
     return keyboard
+
+
+def set_notifications_keyboard(lang, user_id):
+    keyboard = types.ReplyKeyboardMarkup(True)
+
+    keyboard.row(LANG_DICT[lang]['return_btn'])
+
+    return keyboard
