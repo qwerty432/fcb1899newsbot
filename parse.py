@@ -12,6 +12,7 @@ import keyboards
 from useful_dictionaries import CHAMPIONATS_DICT
 from googletrans import Translator
 from languages import LANG_DICT
+import bot_methods
 
 translator = Translator()
 
@@ -26,27 +27,11 @@ def get_team_foot_url(user):
     if user.language == 'ru':
         team_name = user.team
     else:
-        team_name = get_users_teams(user.id)[user.team]
+        team_name = bot_methods.get_users_teams(user.id)[user.team]
 
     team_url = [team['href'] for team in soup.find('section', class_='top-teams').find_all('a') if team.find('img')['alt'] == team_name][0]
 
     return team_url
-
-
-# get countries dict with countries' flags
-def get_countries_dict():
-    with open('country.json', 'r') as file:
-        data = json.load(file)
-
-    return data
-
-
-# get teams of user's chosen championat with translations
-def get_users_teams(user_id):
-    with open('{}_teams.json'.format(user_id)) as file:
-        data = json.load(file)
-
-    return data
 
 
 # parses all information about next match
@@ -94,28 +79,6 @@ def parse_match(champ_name, team_name, user_id, lang=None, match='next'):
     return match
 
 
-# parses general information about next match
-def parse_info(user, lang, match_type='next'):
-    match = parse_match(user.champ, user.team, user.id, lang, match_type)
-
-    if match_type == 'next':
-        match_string = LANG_DICT[lang]['next_match_msg']
-    else:
-        match_string = LANG_DICT[lang]['last_match_msg']
-
-    if match is not None:
-        message_text = "📌 *{} матч*\n⚽ {} {} {}\n🏆 {}, {}\n📅 {}, {}"\
-                                    .format(match_string, match['home'],
-                                            match['score'], match['guest'],
-                                            match['tournament'],
-                                            match['stage'], match['date'],
-                                            match['time'])
-    else:
-        message_text = LANG_DICT[lang]['uknown_match_date_msg']
-
-    return message_text
-
-
 # parse remaining time before next match
 def parse_time(user):
     next_match = parse_match(user.champ, user.team, user.id, match='next')
@@ -143,7 +106,7 @@ def parse_time(user):
     hours = time_left.seconds // 3600
     minutes = (time_left.seconds % 3600) // 60
 
-    endings = get_endings(user.language, time_left.days, hours, minutes)
+    endings = bot_methods.get_endings(user.language, time_left.days, hours, minutes)
 
     message_text = '{} {} {} {}, {} {}, {} {}'.format(LANG_DICT[user.language]['time_to_match_msg'],
                                                       endings[0],
@@ -152,29 +115,6 @@ def parse_time(user):
                                                       minutes, endings[3])
 
     return message_text
-
-
-# gives right endings for different numbers
-def get_endings(lang, *values):
-    endings = []
-    ENDINGS_DICT = LANG_DICT[lang]['endings']
-
-    for i, value in enumerate(values):
-        remainder = value % 10
-        if remainder == 1:
-            if i == 0:
-                endings.append(ENDINGS_DICT['left_message'][0])
-            endings.append(ENDINGS_DICT['values_end_with_1'][i])
-        elif remainder in range(2, 5):
-            if i == 0:
-                endings.append(ENDINGS_DICT['left_message'][1])
-            endings.append(ENDINGS_DICT['values_end_with_234'][i])
-        else:
-            if i == 0:
-                endings.append(ENDINGS_DICT['left_message'][1])
-            endings.append(ENDINGS_DICT['other_values'][i])
-
-    return endings
 
 
 # function for parsing article
@@ -345,7 +285,7 @@ def get_teams_list(user_id):
 def get_teams_squad(user_id):
     user = users_controller.get_user(user_id)
     url = get_team_foot_url(user)
-    countries_dict = get_countries_dict()
+    countries_dict = bot_methods.get_countries_dict()
     lang = user.language
 
     message_text = ''
@@ -394,15 +334,3 @@ def get_teams_squad(user_id):
         message_text += '\n'
 
     return message_text
-
-
-# updates name of team and champ while changing the language
-def update_names(user, updated_lang):
-    data = get_users_teams(user.id)
-
-    if updated_lang == 'ua':
-        users_controller.set_champ(user.id, [champ for champ in CHAMPIONATS_DICT['ua'].keys() if CHAMPIONATS_DICT['ru'][user.champ] == CHAMPIONATS_DICT['ua'][champ]][0])
-        users_controller.set_team(user.id, [team for team in data.keys() if user.team == data[team]][0])
-    else:
-        users_controller.set_champ(user.id, [champ for champ in CHAMPIONATS_DICT['ru'].keys() if CHAMPIONATS_DICT['ua'][user.champ] == CHAMPIONATS_DICT['ru'][champ]][0])
-        users_controller.set_team(user.id, data[user.team])
