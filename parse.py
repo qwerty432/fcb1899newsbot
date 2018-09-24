@@ -123,8 +123,11 @@ def parse_time(user):
     month = int(date.split('.')[1])
     year = int(date.split('.')[2])
 
-    hours = int(time.split(':')[0])
-    minutes = int(time.split(':')[1])
+    try:
+        hours = int(time.split(':')[0])
+        minutes = int(time.split(':')[1])
+    except:
+        return LANG_DICT[user.language]['uknown_match_time_msg']
 
     now = datetime.now()    #exact time when request made
     match_date = datetime(year, month, day, hours, minutes, 0)

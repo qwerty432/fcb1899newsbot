@@ -31,7 +31,8 @@ LANG_DICT = {
             'last_news_msg': 'Последние новости:',
             'no_news_msg': 'Пока нет новостей',
             'articles_msg': 'Статьи',
-            'no_articles_msg': 'Пока нет статей'
+            'no_articles_msg': 'Пока нет статей',
+            'uknown_match_time_msg': 'Время следующего матча неизвестно'
         },
         'ua': {
             'hello_msg': 'Привіт!',
@@ -66,5 +67,6 @@ LANG_DICT = {
             'no_news_msg': 'Новин поки немає',
             'articles_msg': 'Статті',
             'no_articles_msg': 'Поки немає статей',
+            'uknown_match_time_msg': 'Час наступного матчу невідомий'
         }
 }
