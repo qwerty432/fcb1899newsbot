@@ -37,6 +37,12 @@ LANG_DICT = {
             'choose_notifications_msg': 'Выберите тип уведомления',
             'match_started_btn': 'Начало матча {}',
             'text_broadcast_btn': 'Текстовая трансляция {}',
+            'update_match_started_notif_msg': 'Вы {} оповещения о начале матча',
+            'update_text_broadcast_notif_msg': 'Вы {} текстовую трансляцию матча',
+            'enable_msg': {
+                            True: 'включили',
+                            False: 'выключили'
+                          }
         },
         'ua': {
             'hello_msg': 'Привіт!',
@@ -76,5 +82,11 @@ LANG_DICT = {
             'choose_notifications_msg': 'Виберіть тип сповіщення',
             'match_started_btn': 'Початок матчу {}',
             'text_broadcast_btn': 'Текстова трансляція {}',
+            'update_match_started_notif_msg': 'Ви {} сповіщення про початок матчу',
+            'update_text_broadcast_notif_msg': 'Ви {} текстову трансляцію матчу',
+            'enable_msg': {
+                            True: 'ввімкнули',
+                            False: 'вимкнули'
+                          }
         }
 }
