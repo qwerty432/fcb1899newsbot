@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime, date
+from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 from telegraph import Telegraph
 from telegraph.exceptions import TelegraphException
-from config import teletoken, BASE_DIR
+from config import teletoken
 import json
 import users_controller
 import flag
 import keyboards
-from useful_dictionaries import *
+from useful_dictionaries import CHAMPIONATS_DICT
 from googletrans import Translator
 from languages import LANG_DICT
 
 translator = Translator()
+
 
 def get_team_foot_url(user):
     url = CHAMPIONATS_DICT[user.language][user.champ]
@@ -32,6 +33,7 @@ def get_team_foot_url(user):
     return team_url
 
 
+# get countries dict with countries' flags
 def get_countries_dict():
     with open('country.json', 'r') as file:
         data = json.load(file)
@@ -39,6 +41,7 @@ def get_countries_dict():
     return data
 
 
+# get teams of user's chosen championat with translations
 def get_users_teams(user_id):
     with open('{}_teams.json'.format(user_id)) as file:
         data = json.load(file)
@@ -46,7 +49,7 @@ def get_users_teams(user_id):
     return data
 
 
-#parses all information about next match
+# parses all information about next match
 def parse_match(champ_name, team_name, user_id, lang=None, match='next'):
     user = users_controller.get_user(user_id)
     url = get_team_foot_url(user)
@@ -65,7 +68,7 @@ def parse_match(champ_name, team_name, user_id, lang=None, match='next'):
 
     match = {}
 
-    #scrapes next matches table
+    # scrapes next matches table
     try:
         matches = soup.find_all('table', class_='feed-table')[table_num]\
                            .find_all('tr')
@@ -78,7 +81,7 @@ def parse_match(champ_name, team_name, user_id, lang=None, match='next'):
     match['tournament'] = match_where[1]
     match['stage'] = match_where[2]
 
-    #scrapes info about home and guest teams and time of the match
+    #  scrapes info about home and guest teams and time of the match
     match['time'] = matches[1].find_all('td')[0].get_text()
     match['home'] = ' '.join(matches[match_index + 1].find_all('td')[1].get_text().split())
     match['guest'] = ' '.join(matches[match_index + 1].find_all('td')[3].get_text().split())
@@ -91,7 +94,7 @@ def parse_match(champ_name, team_name, user_id, lang=None, match='next'):
     return match
 
 
-#parses general information about next match
+# parses general information about next match
 def parse_info(user, lang, match_type='next'):
     match = parse_match(user.champ, user.team, user.id, lang, match_type)
 
@@ -102,15 +105,18 @@ def parse_info(user, lang, match_type='next'):
 
     if match is not None:
         message_text = "📌 *{} матч*\n⚽ {} {} {}\n🏆 {}, {}\n📅 {}, {}"\
-                                    .format(match_string, match['home'], match['score'], match['guest'], match['tournament'], \
-                                    match['stage'], match['date'], match['time'])
+                                    .format(match_string, match['home'],
+                                            match['score'], match['guest'],
+                                            match['tournament'],
+                                            match['stage'], match['date'],
+                                            match['time'])
     else:
         message_text = LANG_DICT[lang]['uknown_match_date_msg']
 
     return message_text
 
 
-#parse remaining time before next match
+# parse remaining time before next match
 def parse_time(user):
     next_match = parse_match(user.champ, user.team, user.id, match='next')
 
@@ -126,13 +132,13 @@ def parse_time(user):
     try:
         hours = int(time.split(':')[0])
         minutes = int(time.split(':')[1])
-    except:
+    except ValueError:
         return LANG_DICT[user.language]['uknown_match_time_msg']
 
-    now = datetime.now()    #exact time when request made
+    now = datetime.now()    # exact time when request made
     match_date = datetime(year, month, day, hours, minutes, 0)
 
-    time_left = match_date - now    #calculate remaining time
+    time_left = match_date - now    # calculate remaining time
 
     hours = time_left.seconds // 3600
     minutes = (time_left.seconds % 3600) // 60
@@ -148,6 +154,7 @@ def parse_time(user):
     return message_text
 
 
+# gives right endings for different numbers
 def get_endings(lang, *values):
     endings = []
     ENDINGS_DICT = LANG_DICT[lang]['endings']
@@ -170,7 +177,7 @@ def get_endings(lang, *values):
     return endings
 
 
-#function for parsing article
+# function for parsing article
 def parse_article(url, too_big=False):
     content = ''
     page = requests.get(url)
@@ -181,8 +188,8 @@ def parse_article(url, too_big=False):
     soup = BeautifulSoup(html, 'lxml')
     article = soup.find_all('article')[0]
 
-    title = article.find_all('h1')[0].text  #title of article
-    paragraphs = article.find_all('p')[1:]  #all useful text from article
+    title = article.find_all('h1')[0].text  # title of article
+    paragraphs = article.find_all('p')[1:]  # all useful text from article
 
     header = article.find('div', class_='news-header-top')
     if header:
@@ -191,7 +198,7 @@ def parse_article(url, too_big=False):
             content += "<img src='{}'></img>".format('/'.join(url.split('/')[:3]) + img['src'])
 
     for p in paragraphs:
-        if 'class="intro"' in str(p):  #get article photo
+        if 'class="intro"' in str(p):  # get article photo
             try:
                 image_url = article.find('div', class_='article-photo').find('img')['src']
                 content += "<img src='{}'></img>".format(image_url)
@@ -200,24 +207,23 @@ def parse_article(url, too_big=False):
             content += p.get_text()
 
         elif 'img' in str(p):
-            image_url = p.find('img')['src']    #get image's url
-            content += "<img src='{}'></img>".format(image_url)    #create image path appr. for Telegraph
+            image_url = p.find('img')['src']    # get image's url
+            content += "<img src='{}'></img>".format(image_url)    # create image path appr. for Telegraph
 
-        elif('span' not in str(p)):  #'span' tag is not allowed in telegraph
+        elif('span' not in str(p)):  # 'span' tag is not allowed in telegraph
             content += str(p)
 
-
-    #if article is too big we split it into two different Instant Views
+    # if article is too big we split it into two different Instant Views
     if too_big:
-        content_list = content.split('<p')  #split all paragraphs
-        middle = int(len(content_list) / 2) #middle of all paragraphs
+        content_list = content.split('<p')  # split all paragraphs
+        middle = int(len(content_list) / 2)  # middle of all paragraphs
 
-        content1 = '<p'.join(content_list[:middle]) #first page
+        content1 = '<p'.join(content_list[:middle])  # first page
 
         content_list[middle] = '<p' + content_list[middle]
-        content2 = '<p'.join(content_list[middle:]) #second page
+        content2 = '<p'.join(content_list[middle:])  # second page
 
-        titles = [title + '. Part1', title + '. Part2'] #titles for 2 pages
+        titles = [title + '. Part1', title + '. Part2']  # titles for 2 pages
         content = [content1, content2]
 
         return titles, content
@@ -225,18 +231,16 @@ def parse_article(url, too_big=False):
     return title, content
 
 
-#function for creating Instant View
+# function for creating Instant View
 def create_instant_view(url):
     telegraph = Telegraph(teletoken)
-    too_big = False
-
     title, content = parse_article(url)
 
     try:
         response = telegraph.create_page(title=title, html_content=content)
-        return response['url']  #url of created telegraph page
+        return response['url']  # url of created telegraph page
 
-    except TelegraphException: #if article is too big
+    except TelegraphException:  # if article is too big
         print("Oh no, something went wrong.")
         titles, contents = parse_article(url, too_big=True)
 
@@ -244,10 +248,11 @@ def create_instant_view(url):
                                           html_content=contents[0])
         response2 = telegraph.create_page(title=titles[1],
                                           html_content=contents[1])
-        #urls of created telegraph pages
+        # urls of created telegraph pages
         return [response1['url'], response2['url']]
 
 
+# parses latest news
 def send_news(self, user_id, lang):
     titles = []
     urls = []
@@ -265,7 +270,7 @@ def send_news(self, user_id, lang):
     news = soup.find('article', class_='news-feed')
 
     try:
-        other_news = news.find('ul').find_all('li', attrs={'class':None})[:10]
+        other_news = news.find('ul').find_all('li', attrs={'class': None})[:10]
 
         for article in other_news:
             titles.append(article.find('a').get_text())
@@ -279,6 +284,7 @@ def send_news(self, user_id, lang):
         self.bot.send_message(user_id, LANG_DICT[lang]['no_news_msg'])
 
 
+# parses articles
 def send_articles(self, user_id, lang):
     titles = []
     urls = []
@@ -312,17 +318,7 @@ def send_articles(self, user_id, lang):
         self.bot.send_message(user_id, LANG_DICT[lang]['no_articles_msg'])
 
 
-def get_football_link(name):
-    url = 'http://football.ua/default.aspx?menu_id=search_team&search={}'.format(name)
-    page = requests.get(url)
-    html = page.text
-
-    soup = BeautifulSoup(html, 'lxml')
-    link = soup.find('div', class_='clubs').find('div', class_='result-block').find('div', class_='text').find('a')['href']
-
-    return link
-
-
+# gives list of teams
 def get_teams_list(user_id):
     user = users_controller.get_user(user_id)
     url = CHAMPIONATS_DICT[user.language][user.champ]
@@ -345,6 +341,7 @@ def get_teams_list(user_id):
         return translated_teams
 
 
+# gives team's squad
 def get_teams_squad(user_id):
     user = users_controller.get_user(user_id)
     url = get_team_foot_url(user)
@@ -370,9 +367,9 @@ def get_teams_squad(user_id):
         footballers = position_table.find_all('tr')
         country_emoji = ''
 
-        footballer_names_str = '\n'.join([footballer.find('td', class_='num').get_text() \
-                            + '. ' \
-                            + footballer.find('a').get_text() for footballer in footballers])
+        footballer_names_str = '\n'.join([footballer.find('td', class_='num').get_text()
+                                          + '. '
+                                          + footballer.find('a').get_text() for footballer in footballers])
         if lang == 'ua':
             translated_names = translator.translate(footballer_names_str, src='ru', dest='uk').text.split('\n')
         else:
@@ -399,6 +396,7 @@ def get_teams_squad(user_id):
     return message_text
 
 
+# updates name of team and champ while changing the language
 def update_names(user, updated_lang):
     data = get_users_teams(user.id)
 
