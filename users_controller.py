@@ -1,5 +1,5 @@
 from db import connect
-from sqlalchemy import Table, Column, Integer, String, ARRAY
+from sqlalchemy import Table, Column, Integer, String, Boolean, ARRAY
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import select
 import json
@@ -9,14 +9,16 @@ con, meta = connect()
 def create_user_table():
     try:
         users = Table('users', meta,
-            Column('id', Integer, primary_key=True),
-            Column('username', String),
-            Column('language', String(2)),
-            Column('state', String(50)),
-            Column('champ', String(20)),
-            Column('team', String(20)),
-            Column('news_urls', ARRAY(String), default=[])
-            )
+                      Column('id', Integer, primary_key=True),
+                      Column('username', String),
+                      Column('language', String(2)),
+                      Column('champ', String(20)),
+                      Column('state', String(50)),
+                      Column('team', String(20)),
+                      Column('match_started_notification', Boolean),
+                      Column('text_broadcast', Boolean),
+                      Column('news_urls', ARRAY(String), default=[])
+                     )
         meta.create_all(con)
     except:
         print('Table already exists')
@@ -43,7 +45,9 @@ def create_user(message):
     query = users.insert().values(id=message.chat.id,
                                    username=message.from_user.username,
                                    state='start',
-                                   language='ru')
+                                   language='ua',
+                                   match_started_notification=False,
+                                   text_broadcast=False)
     try:
         con.execute(query)
     except IntegrityError:
