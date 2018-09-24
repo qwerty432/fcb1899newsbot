@@ -1,7 +1,7 @@
 import users_controller
 import keyboards
 import parse
-from useful_dictionaries import CHAMPIONATS_DICT
+from useful_dictionaries import CHAMPIONATS_DICT, BOOL_DICT
 from languages import LANG_DICT
 import bot_methods
 
@@ -130,5 +130,13 @@ class States(object):
             self.bot.send_message(message.chat.id, LANG_DICT[lang]['choose_notifications_msg'],
                                   reply_markup=keyboards.set_notifications_keyboard(user))
         else:
-            if message.text == LANG_DICT[lang]['return_btn']:
+            if message.text == LANG_DICT[lang]['match_started_btn'].format(BOOL_DICT[user.match_started_notification]):
+                self.bot.send_message(message.chat.id, 'Enable/disable notification for start of match')
+                bot_methods.update_notifications(user, 'match_started_notification')
+                self.go_to_state(message, 'notifications_state')
+            elif message.text == LANG_DICT[lang]['text_broadcast_btn'].format(BOOL_DICT[user.text_broadcast]):
+                self.bot.send_message(message.chat.id, 'Enable/disable notification for text broadcast')
+                bot_methods.update_notifications(user, 'text_broadcast')
+                self.go_to_state(message, 'notifications_state')
+            elif message.text == LANG_DICT[lang]['return_btn']:
                 self.go_to_state(message, 'settings_state')

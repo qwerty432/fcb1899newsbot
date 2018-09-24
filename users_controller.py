@@ -116,3 +116,11 @@ def set_lang(user_id, lang):
     query = users.update().where(users.c.id == user_id).values(language=change_lang)
 
     con.execute(query)
+
+
+def set_notifications(user_id, match_started, text_broadcast):
+    users = meta.tables['users']
+    query = users.update().where(users.c.id == user_id).values(match_started_notification=match_started,
+                                                               text_broadcast=text_broadcast)
+
+    con.execute(query)

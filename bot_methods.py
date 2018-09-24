@@ -76,3 +76,10 @@ def update_names(user, updated_lang):
     else:
         users_controller.set_champ(user.id, [champ for champ in CHAMPIONATS_DICT['ru'].keys() if CHAMPIONATS_DICT['ua'][user.champ] == CHAMPIONATS_DICT['ru'][champ]][0])
         users_controller.set_team(user.id, data[user.team])
+
+
+def update_notifications(user, notification_type):
+    if notification_type == 'match_started_notification':
+        users_controller.set_notifications(user.id, not user.match_started_notification, user.text_broadcast)
+    else:
+        users_controller.set_notifications(user.id, user.match_started_notification, not user.text_broadcast)
