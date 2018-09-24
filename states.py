@@ -131,11 +131,11 @@ class States(object):
                                   reply_markup=keyboards.set_notifications_keyboard(user))
         else:
             if message.text == LANG_DICT[lang]['match_started_btn'].format(BOOL_DICT[user.match_started_notification]):
-                self.bot.send_message(message.chat.id, 'Enable/disable notification for start of match')
+                self.bot.send_message(message.chat.id, LANG_DICT[lang]['update_match_started_notif_msg'].format(LANG_DICT[lang]['enable_msg'][not user.match_started_notification]))
                 bot_methods.update_notifications(user, 'match_started_notification')
                 self.go_to_state(message, 'notifications_state')
             elif message.text == LANG_DICT[lang]['text_broadcast_btn'].format(BOOL_DICT[user.text_broadcast]):
-                self.bot.send_message(message.chat.id, 'Enable/disable notification for text broadcast')
+                self.bot.send_message(message.chat.id, LANG_DICT[lang]['update_text_broadcast_notif_msg'].format(LANG_DICT[lang]['enable_msg'][not user.text_broadcast]))
                 bot_methods.update_notifications(user, 'text_broadcast')
                 self.go_to_state(message, 'notifications_state')
             elif message.text == LANG_DICT[lang]['return_btn']:
