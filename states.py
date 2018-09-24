@@ -1,15 +1,18 @@
 import users_controller
 import keyboards
 import parse
-from useful_dictionaries import *
+from useful_dictionaries import CHAMPIONATS_DICT
 from languages import LANG_DICT
+import bot_methods
 
 
 class States(object):
     def __init__(self, bot):
         self.bot = bot
-        self.states = {'start': self.start_state, 'settings_state': self.settings_state,
-                       'choose_team_state': self.choose_team_state, 'choose_champ_state': self.choose_champ_state
+        self.states = {'start': self.start_state,
+                       'settings_state': self.settings_state,
+                       'choose_team_state': self.choose_team_state,
+                       'choose_champ_state': self.choose_champ_state
                        }
 
     def handle_states(self, message, first_entry=False):
@@ -38,12 +41,12 @@ class States(object):
         else:
             if message.text == LANG_DICT[lang]['next_match_btn']:
                 self.bot.send_message(message.chat.id,
-                                      parse.parse_info(users_controller.get_user(message.chat.id), lang),
+                                      bot_methods.get_match_info(users_controller.get_user(message.chat.id), lang),
                                       parse_mode='markdown')
 
             elif message.text == LANG_DICT[lang]['last_match_btn']:
                 self.bot.send_message(message.chat.id,
-                                      parse.parse_info(users_controller.get_user(message.chat.id), lang,
+                                      bot_methods.get_match_info(users_controller.get_user(message.chat.id), lang,
                                                        match_type='last'),
                                       parse_mode='markdown')
 
@@ -76,7 +79,7 @@ class States(object):
             if message.text == LANG_DICT[lang]['change_lang_btn']:
                 users_controller.set_lang(message.chat.id, lang)
                 updated_lang = users_controller.get_user(message.chat.id).language
-                parse.update_names(user, updated_lang)
+                bot_methods.update_names(user, updated_lang)
                 self.bot.send_message(message.chat.id, LANG_DICT[updated_lang]['changed_lang_msg'])
                 self.go_to_state(message, 'settings_state')
             elif message.text == LANG_DICT[lang]['choose_team_btn']:
