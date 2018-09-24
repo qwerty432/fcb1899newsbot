@@ -53,6 +53,7 @@ def set_settings_keyboard(lang):
 
     keyboard.row(LANG_DICT[lang]['change_lang_btn'])
     keyboard.row(LANG_DICT[lang]['choose_team_btn'])
+    keyboard.row(LANG_DICT[lang]['notifications_btn'])
     keyboard.row(LANG_DICT[lang]['return_btn'])
     return keyboard
 
