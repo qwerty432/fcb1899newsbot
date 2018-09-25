@@ -112,3 +112,6 @@ def handle_monitorings(bot):
                         bot.send_message(user.id, get_match_info(user),
                                          parse_mode='markdown')
                         users_controller.update_match_started_notifs(user, 'day_left')
+                    elif hours == 0 and minutes == 10 and not user.match_started_notifs['ten_minutes_left']:
+                        bot.send_message(user.id, LANG_DICT[user.language]['ten_minutes_left_msg'])
+                        users_controller.update_match_started_notifs(user, 'ten_minutes_left')
