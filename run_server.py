@@ -3,9 +3,12 @@ from telebot import types
 from config import *
 from time import sleep
 from bot_handlers import bot
+import threading
+import bot_methods
 
 
 app = flask.Flask(__name__)
+threading.Thread(target=bot_methods.handle_monitorings, args=(bot,)).start()
 
 @app.route(WEBHOOK_URL_PATH, methods=['POST'])
 def web_hook():
@@ -19,6 +22,7 @@ def web_hook():
 
 
 if __name__ == "__main__":
+    bot.polling(none_stop=True)
     bot.remove_webhook()
     sleep(1)
     bot.set_webhook(url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH,

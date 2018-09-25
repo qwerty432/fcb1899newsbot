@@ -23,7 +23,8 @@ def get_users_teams(user_id):
 
 
 # gives general information about next match
-def get_match_info(user, lang, match_type='next'):
+def get_match_info(user, match_type='next'):
+    lang = user.language
     match = parse.parse_match(user.champ, user.team, user.id, lang, match_type)
 
     if match_type == 'next':
@@ -97,3 +98,17 @@ def update_notifications(user, notification_type):
         users_controller.set_notifications(user.id, not user.match_started, user.text_broadcast)
     else:
         users_controller.set_notifications(user.id, user.match_started, not user.text_broadcast)
+
+
+def handle_monitorings(bot):
+    users = users_controller.get_users_with_match_started_enabled()
+    while True:
+        if datetime.now().minute % 5 == 1:
+            for user in users:
+                days, hours, minutes = parse.parse_time(user)
+                if days == 0:
+                    if datetime.now().hour == 10 and not user.match_started_notifs['day_left']:
+                        bot.send_message(user.id, LANG_DICT[user.language]['match_today_msg'])
+                        bot.send_message(user.id, get_match_info(user),
+                                         parse_mode='markdown')
+                        users_controller.update_match_started_notifs(user, 'day_left')
