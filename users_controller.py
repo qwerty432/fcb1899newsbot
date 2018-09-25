@@ -66,6 +66,23 @@ def get_all_users():
         print(row)
 
 
+def get_users_with_match_started_enabled():
+    try:
+        users = meta.tables['users']
+    except KeyError:
+        print('Table does not exist')
+    query = select([users]).where(users.c.match_started_notification == True)
+    result = con.execute(query)
+
+    try:
+        result = con.execute(query).fetchall()
+        print(result)
+    except:
+        print('Error with getting users')
+
+    return result
+
+
 def get_user(user_id):
     users = meta.tables['users']
     query = users.select().where(users.c.id == user_id)
