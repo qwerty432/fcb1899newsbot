@@ -84,7 +84,7 @@ def set_notifications_keyboard(user):
     lang = user.language
     keyboard = types.ReplyKeyboardMarkup(True)
 
-    keyboard.row(LANG_DICT[lang]['match_started_btn'].format(BOOL_DICT[user.match_started_notification]))
+    keyboard.row(LANG_DICT[lang]['match_started_btn'].format(BOOL_DICT[user.match_started]))
     keyboard.row(LANG_DICT[lang]['text_broadcast_btn'].format(BOOL_DICT[user.text_broadcast]))
     keyboard.row(LANG_DICT[lang]['return_btn'])
 

@@ -42,13 +42,13 @@ class States(object):
         else:
             if message.text == LANG_DICT[lang]['next_match_btn']:
                 self.bot.send_message(message.chat.id,
-                                      bot_methods.get_match_info(users_controller.get_user(message.chat.id), lang),
+                                      bot_methods.get_match_info(users_controller.get_user(message.chat.id)),
                                       parse_mode='markdown')
 
             elif message.text == LANG_DICT[lang]['last_match_btn']:
                 self.bot.send_message(message.chat.id,
-                                      bot_methods.get_match_info(users_controller.get_user(message.chat.id), lang,
-                                                       match_type='last'),
+                                      bot_methods.get_match_info(users_controller.get_user(message.chat.id),
+                                      match_type='last'),
                                       parse_mode='markdown')
 
             elif message.text == LANG_DICT[lang]['news_btn']:
@@ -62,7 +62,7 @@ class States(object):
                                       parse_mode='markdown')
 
             elif message.text == LANG_DICT[lang]['time_btn']:
-                bot_methods.send_time_to_match(users_controller.get_user(message.chat.id))
+                bot_methods.send_time_to_match(self.bot, users_controller.get_user(message.chat.id))
 
             elif message.text == LANG_DICT[lang]['settings_btn']:
                 self.go_to_state(message, 'settings_state')
