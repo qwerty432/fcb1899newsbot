@@ -62,7 +62,7 @@ class States(object):
                                       parse_mode='markdown')
 
             elif message.text == LANG_DICT[lang]['time_btn']:
-                self.bot.send_message(message.chat.id, parse.parse_time(users_controller.get_user(message.chat.id)))
+                bot_methods.send_time_to_match(users_controller.get_user(message.chat.id))
 
             elif message.text == LANG_DICT[lang]['settings_btn']:
                 self.go_to_state(message, 'settings_state')
@@ -130,9 +130,9 @@ class States(object):
             self.bot.send_message(message.chat.id, LANG_DICT[lang]['choose_notifications_msg'],
                                   reply_markup=keyboards.set_notifications_keyboard(user))
         else:
-            if message.text == LANG_DICT[lang]['match_started_btn'].format(BOOL_DICT[user.match_started_notification]):
-                self.bot.send_message(message.chat.id, LANG_DICT[lang]['update_match_started_notif_msg'].format(LANG_DICT[lang]['enable_msg'][not user.match_started_notification]))
-                bot_methods.update_notifications(user, 'match_started_notification')
+            if message.text == LANG_DICT[lang]['match_started_btn'].format(BOOL_DICT[user.match_started]):
+                self.bot.send_message(message.chat.id, LANG_DICT[lang]['update_match_started_notif_msg'].format(LANG_DICT[lang]['enable_msg'][not user.match_started]))
+                bot_methods.update_notifications(user, 'match_started')
                 self.go_to_state(message, 'notifications_state')
             elif message.text == LANG_DICT[lang]['text_broadcast_btn'].format(BOOL_DICT[user.text_broadcast]):
                 self.bot.send_message(message.chat.id, LANG_DICT[lang]['update_text_broadcast_notif_msg'].format(LANG_DICT[lang]['enable_msg'][not user.text_broadcast]))

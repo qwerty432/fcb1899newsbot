@@ -106,15 +106,7 @@ def parse_time(user):
     hours = time_left.seconds // 3600
     minutes = (time_left.seconds % 3600) // 60
 
-    endings = bot_methods.get_endings(user.language, time_left.days, hours, minutes)
-
-    message_text = '{} {} {} {}, {} {}, {} {}'.format(LANG_DICT[user.language]['time_to_match_msg'],
-                                                      endings[0],
-                                                      time_left.days, endings[1],
-                                                      hours, endings[2],
-                                                      minutes, endings[3])
-
-    return message_text
+    return time_left.days, hours, minutes
 
 
 # function for parsing article

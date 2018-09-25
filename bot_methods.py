@@ -2,6 +2,7 @@ import json
 import parse
 from languages import LANG_DICT
 import users_controller
+from datetime import datetime
 from useful_dictionaries import CHAMPIONATS_DICT
 
 
@@ -66,6 +67,19 @@ def get_endings(lang, *values):
     return endings
 
 
+def send_time_to_match(bot, user):
+    days, hours, minutes = parse.parse_time(user)
+    endings = get_endings(user.language, days, hours, minutes)
+
+    message_text = '{} {} {} {}, {} {}, {} {}'.format(LANG_DICT[user.language]['time_to_match_msg'],
+                                                      endings[0],
+                                                      days, endings[1],
+                                                      hours, endings[2],
+                                                      minutes, endings[3])
+
+    bot.send_message(user.id, message_text)
+
+
 # updates name of team and champ while changing the language
 def update_names(user, updated_lang):
     data = get_users_teams(user.id)
@@ -79,7 +93,7 @@ def update_names(user, updated_lang):
 
 
 def update_notifications(user, notification_type):
-    if notification_type == 'match_started_notification':
-        users_controller.set_notifications(user.id, not user.match_started_notification, user.text_broadcast)
+    if notification_type == 'match_started':
+        users_controller.set_notifications(user.id, not user.match_started, user.text_broadcast)
     else:
-        users_controller.set_notifications(user.id, user.match_started_notification, not user.text_broadcast)
+        users_controller.set_notifications(user.id, user.match_started, not user.text_broadcast)
