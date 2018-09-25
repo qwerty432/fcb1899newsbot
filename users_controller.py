@@ -148,6 +148,9 @@ def set_notifications(user_id, match_started, text_broadcast):
 def update_match_started_notifs(user, key):
     notification_dict = user.match_started_notifs
     notification_dict[key] = not notification_dict[key]
+    for notif_key in notification_dict:
+        if notif_key != key:
+            notification_dict[notif_key] = False
 
     users = meta.tables['users']
     query = users.update().where(users.c.id == user.id).values(match_started_notifs=notification_dict)
