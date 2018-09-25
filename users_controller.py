@@ -1,5 +1,5 @@
 from db import connect
-from sqlalchemy import Table, Column, Integer, String, Boolean, ARRAY
+from sqlalchemy import Table, Column, Integer, String, Boolean, ARRAY, JSON
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import select
 import json
@@ -15,8 +15,9 @@ def create_user_table():
                       Column('champ', String(20)),
                       Column('state', String(50)),
                       Column('team', String(20)),
-                      Column('match_started_notification', Boolean),
+                      Column('match_started', Boolean),
                       Column('text_broadcast', Boolean),
+                      Column('match_started_notifs', JSON),
                       Column('news_urls', ARRAY(String), default=[])
                      )
         meta.create_all(con)
@@ -46,8 +47,9 @@ def create_user(message):
                                    username=message.from_user.username,
                                    state='start',
                                    language='ua',
-                                   match_started_notification=False,
-                                   text_broadcast=False)
+                                   match_started=False,
+                                   text_broadcast=False,
+                                   match_started_notifs={'day_left': False, 'ten_minutes_left': False, 'started': False})
     try:
         con.execute(query)
     except IntegrityError:
@@ -71,7 +73,7 @@ def get_users_with_match_started_enabled():
         users = meta.tables['users']
     except KeyError:
         print('Table does not exist')
-    query = select([users]).where(users.c.match_started_notification == True)
+    query = select([users]).where(users.c.match_started == True)
     result = con.execute(query)
 
     try:
@@ -137,7 +139,17 @@ def set_lang(user_id, lang):
 
 def set_notifications(user_id, match_started, text_broadcast):
     users = meta.tables['users']
-    query = users.update().where(users.c.id == user_id).values(match_started_notification=match_started,
+    query = users.update().where(users.c.id == user_id).values(match_started=match_started,
                                                                text_broadcast=text_broadcast)
+
+    con.execute(query)
+
+
+def update_match_started_notifs(user, key):
+    notification_dict = user.match_started_notifs
+    notification_dict[key] = not notification_dict[key]
+
+    users = meta.tables['users']
+    query = users.update().where(users.c.id == user.id).values(match_started_notifs=notification_dict)
 
     con.execute(query)
