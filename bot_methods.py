@@ -103,7 +103,7 @@ def update_notifications(user, notification_type):
 def handle_monitorings(bot):
     users = users_controller.get_users_with_match_started_enabled()
     while True:
-        if datetime.now().minute % 5 == 1:
+        if datetime.now().minute % 5 == 0:
             for user in users:
                 days, hours, minutes = parse.parse_time(user)
                 if days == 0:
@@ -115,3 +115,8 @@ def handle_monitorings(bot):
                     elif hours == 0 and minutes == 10 and not user.match_started_notifs['ten_minutes_left']:
                         bot.send_message(user.id, LANG_DICT[user.language]['ten_minutes_left_msg'])
                         users_controller.update_match_started_notifs(user, 'ten_minutes_left')
+                    elif hours == 0 and minutes == 0 and not user.match_started_notifs['started']:
+                        bot.send_message(user.id, LANG_DICT[user.language]['match_started_msg'])
+                        users_controller.update_match_started_notifs(user, 'started')
+                    else:
+                        users_controller.update_match_started_notifs(user)

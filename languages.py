@@ -44,7 +44,8 @@ LANG_DICT = {
                             False: 'выключили'
                           },
             'match_today_msg': 'Матч вашей команды уже сегодня!',
-            'ten_minutes_left_msg': 'До матча осталось 10 минут!'
+            'ten_minutes_left_msg': 'До матча осталось 10 минут!',
+            'match_started_msg': 'Матч начался!'
         },
         'ua': {
             'hello_msg': 'Привіт!',
@@ -91,6 +92,7 @@ LANG_DICT = {
                             False: 'вимкнули'
                           },
             'match_today_msg': 'Матч вашої команди вже сьогодні!',
-            'ten_minutes_left_msg': 'До матчу залишилося 10 хвилин!'
+            'ten_minutes_left_msg': 'До матчу залишилося 10 хвилин!',
+            'match_started_msg': 'Матч розпочався!'
         }
 }
