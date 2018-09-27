@@ -69,14 +69,24 @@ def get_endings(lang, *values):
 
 
 def send_time_to_match(bot, user):
-    days, hours, minutes = parse.parse_time(user)
-    endings = get_endings(user.language, days, hours, minutes)
+    time = parse.parse_time(user)
 
-    message_text = '{} {} {} {}, {} {}, {} {}'.format(LANG_DICT[user.language]['time_to_match_msg'],
-                                                      endings[0],
-                                                      days, endings[1],
-                                                      hours, endings[2],
-                                                      minutes, endings[3])
+    if isinstance(time, str):
+        message_text = time
+        bot.send_message(user.id, message_text)
+        return
+    else:
+        days, hours, minutes = time
+    endings = get_endings(user.language, days, hours, minutes)
+]
+    if minutes < 0:
+        message_text = LANG_DICT[user.language]['match_started_msg']
+    else:
+        message_text = '{} {} {} {}, {} {}, {} {}'.format(LANG_DICT[user.language]['time_to_match_msg'],
+                                                          endings[0],
+                                                          days, endings[1],
+                                                          hours, endings[2],
+                                                          minutes, endings[3])
 
     bot.send_message(user.id, message_text)
 
