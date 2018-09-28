@@ -263,8 +263,16 @@ def get_teams_list(user_id):
     teams = [team['alt'] for team in soup.find('section', class_='top-teams').find_all('img')]
 
     translated_teams = [team for team in translator.translate('\n'.join(teams), src='ru', dest='uk').text.split('\n')]
-    data = dict(zip(translated_teams, teams))
-    with open('{}_teams.json'.format(user_id), 'w') as file:
+    user_teams = dict(zip(translated_teams, teams))
+
+    try:
+        with open('teams.json') as file:
+            data = json.load(file)
+    except:
+            data = {}
+
+    with open('teams.json', 'w') as file:
+        data[user_id] = user_teams
         json.dump(data, file)
 
     if user.language == 'ru':

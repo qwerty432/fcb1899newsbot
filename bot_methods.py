@@ -16,10 +16,10 @@ def get_countries_dict():
 
 # get teams of user's chosen championat with translations
 def get_users_teams(user_id):
-    with open('{}_teams.json'.format(user_id)) as file:
+    with open('teams.json') as file:
         data = json.load(file)
 
-    return data
+    return data[str(user_id)]
 
 
 # gives general information about next match
@@ -78,7 +78,7 @@ def send_time_to_match(bot, user):
     else:
         days, hours, minutes = time
     endings = get_endings(user.language, days, hours, minutes)
-]
+
     if minutes < 0:
         message_text = LANG_DICT[user.language]['match_started_msg']
     else:
