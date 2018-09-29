@@ -109,6 +109,24 @@ def parse_time(user):
     return time_left.days, hours, minutes
 
 
+def parse_match_links(user):
+    url = 'http://gooool.org/'
+    page = requests.get(url)
+    html = page.text
+
+    soup = BeautifulSoup(html, 'lxml')
+    matches_table = soup.find('div', class_='game-in')
+    matches = matches_table.find_all('a')
+    match = [match for match in matches if user.team in match.get_text()][0]
+
+    match_url = match['href']
+    match_page = requests.get(match_url)
+    html = match_page.text
+
+    soup = BeautifulSoup(html, 'lxml')
+    sopcast_table, acestream_table = soup.find('div', class_='img-wrp').find_all('table')
+
+
 # function for parsing article
 def parse_article(url, too_big=False):
     content = ''
