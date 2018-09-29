@@ -109,6 +109,15 @@ def parse_time(user):
     return time_left.days, hours, minutes
 
 
+def parse_sopcast_links(table):
+    links = []
+    links_blocks = table.find_all('td')[2].find_all('strong')
+    for link in links_blocks:
+        links.append((link.find('a').get_text(), link.get_text('\n').split('\n')[1]))
+
+    return links
+
+
 def parse_match_links(user):
     url = 'http://gooool.org/'
     page = requests.get(url)
@@ -125,6 +134,8 @@ def parse_match_links(user):
 
     soup = BeautifulSoup(html, 'lxml')
     sopcast_table, acestream_table = soup.find('div', class_='img-wrp').find_all('table')
+
+    return parse_sopcast_links(sopcast_table)
 
 
 # function for parsing article
