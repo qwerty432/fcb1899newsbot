@@ -146,7 +146,7 @@ def handle_match_started_users(bot, users):
                     bot.send_message(user.id, LANG_DICT[user.language]['ten_minutes_left_msg'])
                     users_controller.update_match_started_notifs(user, 'ten_minutes_left')
                     send_match_links(bot, user)
-                elif hours == 0 and minutes == 0 and not user.match_started_notifs['started']:
+                elif hours == 23 and minutes == 59 and not user.match_started_notifs['started']:
                     bot.send_message(user.id, LANG_DICT[user.language]['match_started_msg'])
                     users_controller.update_match_started_notifs(user, 'started')
                     send_match_links(bot, user)
