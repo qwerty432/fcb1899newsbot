@@ -143,7 +143,7 @@ def parse_match_links(user):
     soup = BeautifulSoup(html, 'lxml')
     sopcast_table, acestream_table = soup.find('div', class_='img-wrp').find_all('table')
 
-    return parse_sopcast_links(sopcast_table), parse_acestream_links(acestream_table)
+    return parse_sopcast_links(sopcast_table), parse_acestream_links(acestream_table), match.get_text()
 
 
 # function for parsing article
