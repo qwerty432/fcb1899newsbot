@@ -4,6 +4,8 @@ from languages import LANG_DICT
 import users_controller
 from datetime import datetime
 from useful_dictionaries import CHAMPIONATS_DICT
+import requests
+from bs4 import BeautifulSoup
 
 
 # get countries dict with countries' flags
@@ -110,6 +112,20 @@ def update_notifications(user, notification_type):
         users_controller.set_notifications(user.id, user.match_started, not user.text_broadcast)
 
 
+def send_match_links(bot, user):
+    sopcast_links, acestream_links, match_name = parse.parse_match_links(user)
+    message_text = '⚽️ *{}*\n\n✔️Sopcast links:\n'.format(match_name)
+    for i, link in enumerate(sopcast_links):
+        message_text += '{}. _{}_{}\n'.format(i + 1, link[0], link[1])
+
+    message_text += '\n✔️Acestream links:\n'
+
+    for i, link in enumerate(acestream_links):
+        message_text += '{}. _{}_{}\n'.format(i + 1, link[0], link[1])
+
+    bot.send_message(user.id, message_text, parse_mode='markdown')
+
+
 def handle_match_started_users(bot, users):
     if datetime.now().minute % 5 == 0:
         for user in users:
@@ -123,14 +139,17 @@ def handle_match_started_users(bot, users):
                 elif hours == 0 and minutes == 10 and not user.match_started_notifs['ten_minutes_left']:
                     bot.send_message(user.id, LANG_DICT[user.language]['ten_minutes_left_msg'])
                     users_controller.update_match_started_notifs(user, 'ten_minutes_left')
-                elif hours == 0 and minutes == 0 and not user.match_started_notifs['started']:
+                    send_match_links(bot, user)
+                elif hours <= 0 and minutes <= 0 and not user.match_started_notifs['started']:
                     bot.send_message(user.id, LANG_DICT[user.language]['match_started_msg'])
                     users_controller.update_match_started_notifs(user, 'started')
+                    send_match_links(bot, user)
                 else:
                     users_controller.update_match_started_notifs(user)
 
 
 def handle_monitorings(bot):
-    users = users_controller.get_users_with_match_started_enabled()
+    match_started_users = users_controller.get_users_with_match_started_enabled()
+    broadcast_users = users_controller.get_users_with_text_broadcast_enabled()
     while True:
-        handle_match_started_users(bot, users)
+        handle_match_started_users(bot, match_started_users)
