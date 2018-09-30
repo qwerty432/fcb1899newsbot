@@ -6,6 +6,8 @@ from datetime import datetime
 from useful_dictionaries import CHAMPIONATS_DICT
 import requests
 from bs4 import BeautifulSoup
+import threading
+from time import sleep
 
 
 # get countries dict with countries' flags
@@ -126,6 +128,10 @@ def send_match_links(bot, user):
     bot.send_message(user.id, message_text, parse_mode='markdown')
 
 
+def start_text_broadcast(bot, user):
+    pass
+
+
 def handle_match_started_users(bot, users):
     if datetime.now().minute % 5 == 0:
         for user in users:
@@ -140,7 +146,7 @@ def handle_match_started_users(bot, users):
                     bot.send_message(user.id, LANG_DICT[user.language]['ten_minutes_left_msg'])
                     users_controller.update_match_started_notifs(user, 'ten_minutes_left')
                     send_match_links(bot, user)
-                elif hours <= 0 and minutes <= 0 and not user.match_started_notifs['started']:
+                elif hours == 0 and minutes == 0 and not user.match_started_notifs['started']:
                     bot.send_message(user.id, LANG_DICT[user.language]['match_started_msg'])
                     users_controller.update_match_started_notifs(user, 'started')
                     send_match_links(bot, user)
@@ -148,8 +154,17 @@ def handle_match_started_users(bot, users):
                     users_controller.update_match_started_notifs(user)
 
 
+def handle_text_broadcast_users(bot, users):
+    if datetime.now().minute % 5 == 0:
+        for user in users:
+            days, hours, minutes = parse.parse_time(user)
+            if days == -1 and hours == 23 and minutes == 59:
+                threading.Thread(target=start_text_broadcast, args=(bot, user,)).start()
+
+
 def handle_monitorings(bot):
     match_started_users = users_controller.get_users_with_match_started_enabled()
     broadcast_users = users_controller.get_users_with_text_broadcast_enabled()
     while True:
         handle_match_started_users(bot, match_started_users)
+        handle_text_broadcast_users(bot, broadcast_users)
