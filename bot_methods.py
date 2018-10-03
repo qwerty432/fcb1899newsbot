@@ -115,13 +115,12 @@ def update_notifications(user, notification_type):
 
 
 def send_match_links(bot, user):
-    # TODO update languages for sopcast and acestream
     sopcast_links, acestream_links, match_name = parse.parse_match_links(user)
-    message_text = '⚽️ *{}*\n\n✔️Sopcast links:\n'.format(match_name)
+    message_text = LANG_DICT[user.language]['sopcast_links_msg'].format(match_name)
     for i, link in enumerate(sopcast_links):
         message_text += '{}. _{}_{}\n'.format(i + 1, link[0], link[1])
 
-    message_text += '\n✔️Acestream links:\n'
+    message_text += LANG_DICT[user.language]['acestream_links_msg']
 
     for i, link in enumerate(acestream_links):
         message_text += '{}. _{}_{}\n'.format(i + 1, link[0], link[1])

@@ -45,7 +45,9 @@ LANG_DICT = {
                           },
             'match_today_msg': 'Матч вашей команды уже сегодня!',
             'ten_minutes_left_msg': 'До матча осталось 10 минут!',
-            'match_started_msg': 'Матч начался!'
+            'match_started_msg': 'Матч начался!',
+            'sopcast_links_msg': '⚽️ *{}*\n\n✔️Sopcast ссылки:\n',
+            'acestream_links_msg': '\n✔️Acestream ссылки:\n'
         },
         'ua': {
             'hello_msg': 'Привіт!',
@@ -93,6 +95,8 @@ LANG_DICT = {
                           },
             'match_today_msg': 'Матч вашої команди вже сьогодні!',
             'ten_minutes_left_msg': 'До матчу залишилося 10 хвилин!',
-            'match_started_msg': 'Матч розпочався!'
+            'match_started_msg': 'Матч розпочався!',
+            'sopcast_links_msg': '⚽️ *{}*\n\n✔️Sopcast посилання:\n',
+            'acestream_links_msg': '\n✔️Acestream посилання:\n'
         }
 }
