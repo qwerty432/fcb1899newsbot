@@ -115,6 +115,7 @@ def update_notifications(user, notification_type):
 
 
 def send_match_links(bot, user):
+    # TODO update languages for sopcast and acestream
     sopcast_links, acestream_links, match_name = parse.parse_match_links(user)
     message_text = '⚽️ *{}*\n\n✔️Sopcast links:\n'.format(match_name)
     for i, link in enumerate(sopcast_links):
@@ -129,12 +130,30 @@ def send_match_links(bot, user):
 
 
 def start_text_broadcast(bot, user):
-    pass
+    match_link = parse.get_match_link(user)
+    match_link = 'https://football.ua/spain/game/63522.html'
+    messages_list = []
+
+    while not parse.is_match_finished(match_link):
+        page = requests.get(match_link)
+        html = page.text
+
+        soup = BeautifulSoup(html, 'lxml')
+        online_broadcast = soup.find('ul', class_='online-list')
+        for message in online_broadcast.find_all('li'):
+            message_text = message.get_text()
+            if message_text not in messages_list:
+                messages_list.append(message_text)
+                bot.send_message(user.id, message_text)
+        sleep(60)
+
+    del messages_list
 
 
 def handle_match_started_users(bot, users):
     if datetime.now().minute % 5 == 0:
         for user in users:
+            # TODO time to next match uknown
             days, hours, minutes = parse.parse_time(user)
             if days == 0:
                 if datetime.now().hour == 10 and not user.match_started_notifs['day_left']:
@@ -146,12 +165,12 @@ def handle_match_started_users(bot, users):
                     bot.send_message(user.id, LANG_DICT[user.language]['ten_minutes_left_msg'])
                     users_controller.update_match_started_notifs(user, 'ten_minutes_left')
                     send_match_links(bot, user)
-                elif hours == 23 and minutes == 59 and not user.match_started_notifs['started']:
-                    bot.send_message(user.id, LANG_DICT[user.language]['match_started_msg'])
-                    users_controller.update_match_started_notifs(user, 'started')
-                    send_match_links(bot, user)
                 else:
                     users_controller.update_match_started_notifs(user)
+            elif days == -1 and hours == 23 and minutes == 59 and not user.match_started_notifs['started']:
+                bot.send_message(user.id, LANG_DICT[user.language]['match_started_msg'])
+                users_controller.update_match_started_notifs(user, 'started')
+                send_match_links(bot, user)
 
 
 def handle_text_broadcast_users(bot, users):
@@ -159,7 +178,7 @@ def handle_text_broadcast_users(bot, users):
         for user in users:
             days, hours, minutes = parse.parse_time(user)
             if days == -1 and hours == 23 and minutes == 59:
-                threading.Thread(target=start_text_broadcast, args=(bot, user,)).start()
+                threading.Thread(target=start_text_broadcast, args=(bot, users,)).start()
 
 
 def handle_monitorings(bot):
