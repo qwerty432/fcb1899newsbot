@@ -79,6 +79,21 @@ def parse_match(champ_name, team_name, user_id, lang=None, match='next'):
     return match
 
 
+def get_match_link(user):
+    user = users_controller.get_user(user.id)
+    url = get_team_foot_url(user)
+
+    page = requests.get(url)
+    html = page.text
+
+    soup = BeautifulSoup(html, 'lxml')
+
+    match = soup.find_all('table', class_='feed-table')[1].find_all('tr')[1]
+    match_link = match.find('td', class_='score').find('a')['href']
+
+    return match_link
+
+
 # parse remaining time before next match
 def parse_time(user):
     next_match = parse_match(user.champ, user.team, user.id, match='next')
@@ -141,7 +156,9 @@ def parse_match_links(user):
     html = match_page.text
 
     soup = BeautifulSoup(html, 'lxml')
+    print(soup.find('div', class_='img-wrp'))
     sopcast_table, acestream_table = soup.find('div', class_='img-wrp').find_all('table')
+
 
     return parse_sopcast_links(sopcast_table), parse_acestream_links(acestream_table), match.get_text()
 
