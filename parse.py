@@ -94,6 +94,20 @@ def get_match_link(user):
     return match_link
 
 
+def is_match_finished(match_link):
+    page = requests.get(match_link)
+    html = page.text
+
+    soup = BeautifulSoup(html, 'lxml')
+    info_table = soup.find('table', class_='match-info-table')
+    status = info_table.find_all('tr')[2].find('td').find('strong').get_text()
+
+    if status == 'завершен':
+        return True
+    else:
+        return False
+
+
 # parse remaining time before next match
 def parse_time(user):
     next_match = parse_match(user.champ, user.team, user.id, match='next')
