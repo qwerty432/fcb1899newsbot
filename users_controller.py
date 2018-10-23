@@ -31,6 +31,7 @@ def delete_all_users():
         con.execute(user_table.delete())
     except KeyError:
         print('Table does not exist')
+        create_user_table()
 
 
 def drop_user_table():
@@ -42,7 +43,12 @@ def drop_user_table():
 
 
 def create_user(message):
-    users = meta.tables['users']
+    try:
+        users = meta.tables['users']
+    except KeyError:
+        print('Table does not exist')
+        create_user_table()
+        users = meta.tables['users']
     query = users.insert().values(id=message.chat.id,
                                    username=message.from_user.username,
                                    state='start',
@@ -61,6 +67,8 @@ def get_all_users():
         users = meta.tables['users']
     except KeyError:
         print('Table does not exist')
+        create_user_table()
+        users = meta.tables['users']
     query = select([users])
     result = con.execute(query)
 
@@ -103,13 +111,14 @@ def get_users_with_text_broadcast_enabled():
 
 
 def get_user(user_id):
-    users = meta.tables['users']
-    query = users.select().where(users.c.id == user_id)
-
     try:
-        result = con.execute(query).fetchone()
+        users = meta.tables['users']
     except:
         print('Table does not exist')
+        create_user_table()
+        users = meta.tables['users']
+    query = users.select().where(users.c.id == user_id)
+    result = con.execute(query).fetchone()
 
     return result
 
