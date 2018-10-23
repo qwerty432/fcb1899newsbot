@@ -4,6 +4,7 @@ from bot import bot
 from states import States
 import users_controller
 import parse
+from time import sleep
 
 state_handler = States(bot)
 
@@ -46,4 +47,8 @@ def callback_inline(call):
 
 if __name__ == '__main__':
     bot.remove_webhook()
-    bot.polling(none_stop=True)
+    while True:
+        try:
+            bot.polling(none_stop=True)
+        except:
+            sleep(5)
