@@ -35,8 +35,7 @@ def get_team_foot_url(user):
 
 
 # parses all information about next match
-def parse_match(champ_name, team_name, user_id, lang=None, match='next'):
-    user = users_controller.get_user(user_id)
+def parse_match(user, lang=None, match='next'):
     url = get_team_foot_url(user)
 
     if match == 'next':
@@ -72,6 +71,11 @@ def parse_match(champ_name, team_name, user_id, lang=None, match='next'):
     match['guest'] = ' '.join(matches[match_index + 1].find_all('td')[3].get_text().split())
     match['score'] = ' '.join(matches[match_index + 1].find_all('td')[2].get_text().split())
 
+    if matches[match_index + 1].find('td', class_='score inprogress'):
+        match_status = True
+    else:
+        match_status = False
+
     for key in match:
         if key in ['tournament', 'stage', 'home', 'guest'] and lang == 'ua':
             match[key] = translator.translate(match[key], 'uk').text
@@ -95,22 +99,25 @@ def get_match_link(user):
 
 
 def is_match_finished(match_link):
-    page = requests.get(match_link)
-    html = page.text
-
-    soup = BeautifulSoup(html, 'lxml')
-    info_table = soup.find('table', class_='match-info-table')
-    status = info_table.find_all('tr')[2].find('td').find('strong').get_text()
-
-    if status == 'завершен':
-        return True
-    else:
-        return False
+    url = get_team_foot_url(user)
+    # page = requests.get(match_link)
+    match_status = parse_match(user, match='now')
+    return
+    # html = page.text
+    #
+    # soup = BeautifulSoup(html, 'lxml')
+    # info_table = soup.find('table', class_='match-info-table')
+    # status = info_table.find_all('tr')[2].find('td').find('strong').get_text()
+    #
+    # if status == 'завершен':
+    #     return True
+    # else:
+    #     return False
 
 
 # parse remaining time before next match
 def parse_time(user):
-    next_match = parse_match(user.champ, user.team, user.id, match='next')
+    next_match = parse_match(user, match='next')
 
     if not next_match:
         return LANG_DICT[user.language]['uknown_match_date_msg']

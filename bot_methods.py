@@ -29,7 +29,7 @@ def get_users_teams(user_id):
 # gives general information about next match
 def get_match_info(user, match_type='next'):
     lang = user.language
-    match = parse.parse_match(user.champ, user.team, user.id, lang, match_type)
+    match = parse.parse_match(user, lang, match_type)
 
     if match_type == 'next':
         match_string = LANG_DICT[lang]['next_match_msg']
