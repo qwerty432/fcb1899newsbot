@@ -22,7 +22,7 @@ pre-commit==1.10.3
 psycopg2==2.7.4
 py==1.5.4
 pyTelegramBotAPI==3.5.2
-PyYAML==3.13
+PyYAML==5.4
 requests==2.7.0
 selenium==3.9.0
 six==1.11.0
